@@ -1,20 +1,24 @@
 import * as React from 'react';
 import './App.css';
+import Bipartite, { BGraph } from './Bipartite';
 
-const logo = require('./logo.svg');
+const sources = ['a', 'b', 'c', 'd', 'e'];
+const targets = ['x', 'y', 'z'];
+const links = [
+  {source: 0, target: 0, value: 2},
+  {source: 0, target: 1, value: 3},
+  {source: 1, target: 2, value: 4},
+  {source: 2, target: 1, value: 2},
+  {source: 3, target: 2, value: 1},
+  {source: 4, target: 0, value: 5},
+];
+
+const graph: BGraph = {sources, targets, links};
 
 class App extends React.Component {
   render() {
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.tsx</code> and save to reload.
-        </p>
-      </div>
+      <Bipartite graph={graph}/>
     );
   }
 }
