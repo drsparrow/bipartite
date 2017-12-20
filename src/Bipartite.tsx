@@ -160,26 +160,31 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderLink (link: IBLink) {
-    const sourceLinks = this.props.graph.links.filter(l => l.source === link.source).sort((a,b) => a.target - b.target);
-    let sourceOffset = 0;
-    sourceLinks.some(l => {
-      if (link === l) { return true }
-      sourceOffset += l.value;
-      return false;
-    });
-
-    const targetLinks = this.props.graph.links.filter(l => l.target === link.target).sort((a,b) => a.target - b.target);
-    let targetOffset = 0;
-    targetLinks.some(l => {
-      if (link === l) { return true }
-      targetOffset += l.value;
-      return false;
-    });
-
     const { x1, x2 } = this;
     const { source, target, value } = link;
-    const y1 = this.sourceHeight(source) + sourceOffset + link.value/2;
-    const y2 = this.targetHeight(target) + targetOffset + link.value/2;
+    const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value/2;
+    const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value/2;
     return <BLink {...{value, x1, x2, y1, y2}}/>;
+  }
+
+  private sourceOffset (link: IBLink): number {
+    const links = this.props.graph.links.filter(l => l.source === link.source).sort((a,b) => a.target - b.target);
+    return this.offsetFromLinks(link, links);
+  }
+
+  private targetOffset (link: IBLink): number {
+    const links = this.props.graph.links.filter(l => l.target === link.target).sort((a,b) => a.target - b.target);
+    return this.offsetFromLinks(link, links);
+  }
+
+  private offsetFromLinks (link: IBLink, links: IBLink[]) {
+    let offset = 0;
+    links.some(l => {
+      if (link === l) { return true }
+      offset += l.value;
+      return false;
+    });
+
+    return offset;
   }
 }
