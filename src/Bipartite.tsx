@@ -27,6 +27,7 @@ export interface IBipartiteProps<NodeType={}, LinkType={}, DataType={}> {
 export interface IBipartiteState {
   selectedSources: Set;
   selectedTargets: Set;
+  tightness: number;
 }
 
 export type NodePosition = {x: number, y: number};
@@ -42,18 +43,22 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     super(props);
     this.state = {
       selectedSources: new Set(),
-      selectedTargets: new Set()
+      selectedTargets: new Set(),
+      tightness: 0
     }
   }
 
   public render () {
     const {width, height} = this;
     return (
-      <svg className="Bipartite" {...{width, height}} xmlns="http://www.w3.org/2000/svg">
-        {this.renderLinks()}
-        {this.renderSources()}
-        {this.renderTargets()}
-      </svg>
+      <div className="Bipartite">
+        {this.slider()}
+        <svg {...{width, height}} xmlns="http://www.w3.org/2000/svg">
+          {this.renderLinks()}
+          {this.renderSources()}
+          {this.renderTargets()}
+        </svg>
+      </div>
     );
   }
 
@@ -160,11 +165,12 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderLink (link: IBLink) {
-    const { x1, x2 } = this;
+    const { x1, x2, state } = this;
     const { source, target, value } = link;
+    const {tightness} = state;
     const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value/2;
     const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value/2;
-    return <BLink {...{value, x1, x2, y1, y2}}/>;
+    return <BLink {...{value, x1, x2, y1, y2, tightness}}/>;
   }
 
   private sourceOffset (link: IBLink): number {
@@ -186,5 +192,18 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     });
 
     return offset;
+  }
+
+  private slider () {
+    return (
+      <input
+        type="range"
+        min="-1"
+        max="0"
+        value={this.state.tightness}
+        step="0.01"
+        onChange={(e) => {this.setState({tightness: +e.target.value})}}
+      />
+    );
   }
 }
