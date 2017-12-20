@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Set from './set';
 import BNode from './BNode';
+import BLink from './BLink';
 
 type BasicNode = string;
 type nodeIndex = number;
@@ -160,13 +161,9 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private renderLink (link: IBLink) {
     const { x1, x2 } = this;
-    const { source, target } = link;
+    const { source, target, value } = link;
     const y1 = this.sourceHeight(source);
     const y2 = this.targetHeight(target);
-    const midX = this.width / 2;
-    const d = `M${x1},${y1} C${midX},${y1} ${midX},${y2} ${x2},${y2}`;
-    return (
-      <path d={d} fill="none" stroke="black" strokeWidth={link.value}/>
-    );
+    return <BLink {...{value, x1, x2, y1, y2}}/>;
   }
 }
