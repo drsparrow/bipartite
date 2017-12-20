@@ -9,7 +9,7 @@ type nodeIndex = number;
 export interface IBLink<DataType={}> {
   source: nodeIndex;
   target: nodeIndex;
-  value?: number;
+  value: number;
   data?: DataType;
 }
 
@@ -121,7 +121,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private sizeOfSource(index: nodeIndex): number {
     let size = 0;
     this.props.graph.links.forEach(l => {
-      if (l.source === index) { size += l.value || 0 }
+      if (l.source === index) { size += l.value }
     });
 
     return size;
@@ -130,7 +130,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private sizeOfTarget(index: nodeIndex): number {
     let size = 0;
     this.props.graph.links.forEach(l => {
-      if (l.target === index) { size += l.value || 0 }
+      if (l.target === index) { size += l.value }
     });
 
     return size;
@@ -164,7 +164,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     let sourceOffset = 0;
     sourceLinks.some(l => {
       if (link === l) { return true }
-      sourceOffset += l.value || 0;
+      sourceOffset += l.value;
       return false;
     });
 
@@ -172,14 +172,14 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     let targetOffset = 0;
     targetLinks.some(l => {
       if (link === l) { return true }
-      targetOffset += l.value || 0;
+      targetOffset += l.value;
       return false;
     });
 
     const { x1, x2 } = this;
     const { source, target, value } = link;
-    const y1 = this.sourceHeight(source) + sourceOffset + (link.value || 0)/2;
-    const y2 = this.targetHeight(target) + targetOffset + (link.value || 0)/2;;
+    const y1 = this.sourceHeight(source) + sourceOffset + link.value/2;
+    const y2 = this.targetHeight(target) + targetOffset + link.value/2;
     return <BLink {...{value, x1, x2, y1, y2}}/>;
   }
 }
