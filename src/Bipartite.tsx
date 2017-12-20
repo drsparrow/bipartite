@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Set from './set';
+import BNode from './BNode';
 
 type BasicNode = string;
 type nodeIndex = number;
@@ -27,7 +28,7 @@ export interface BipartiteState {
   selectedTargets: Set;
 }
 
-type Position = {x: number, y: number};
+export type NodePosition = {x: number, y: number};
 
 export default class Bipartite extends React.Component<BipartiteProps, BipartiteState> {
   private height = 400;
@@ -35,7 +36,6 @@ export default class Bipartite extends React.Component<BipartiteProps, Bipartite
   private padding = 10;
   private x1 = this.padding;
   private x2 = this.width - this.padding;
-  private strokeWidth=2;
 
   constructor (props: BipartiteProps) {
     super(props);
@@ -48,7 +48,7 @@ export default class Bipartite extends React.Component<BipartiteProps, Bipartite
   public render () {
     const {width, height} = this;
     return (
-      <svg className="Bipartite" {...{width, height}}>
+      <svg className="Bipartite" {...{width, height}} xmlns="http://www.w3.org/2000/svg">
         {this.renderLinks()}
         {this.renderSources()}
         {this.renderTargets()}
@@ -56,14 +56,14 @@ export default class Bipartite extends React.Component<BipartiteProps, Bipartite
     );
   }
 
-  private sourcePosition (index: nodeIndex): Position {
+  private sourcePosition (index: nodeIndex): NodePosition {
     return {
       x: this.x1,
       y: this.sourceHeight(index)
     };
   }
 
-  private targetPosition (index: nodeIndex): Position {
+  private targetPosition (index: nodeIndex): NodePosition {
     return {
       x: this.x2,
       y: this.targetHeight(index)
@@ -103,12 +103,36 @@ export default class Bipartite extends React.Component<BipartiteProps, Bipartite
 
   private renderSourceNode(index: nodeIndex) {
     const pos = this.sourcePosition(index);
-    return this.renderCircle(pos, () => this.handleSourceClick(index), this.state.selectedSources.includes(index));
+    const height = this.sizeOfSource(index);
+    const onClick = () => this.handleSourceClick(index);
+    const isSelected = this.state.selectedSources.includes(index);
+    return <BNode {...{height, pos, onClick, isSelected}}/>
   }
 
   private renderTargetNode(index: nodeIndex) {
     const pos = this.targetPosition(index);
-    return this.renderCircle(pos, () => this.handleTargetClick(index), this.state.selectedTargets.includes(index));
+    const height = this.sizeOfTarget(index);
+    const onClick = () => this.handleTargetClick(index);
+    const isSelected = this.state.selectedTargets.includes(index);
+    return <BNode {...{height, pos, onClick, isSelected}}/>
+  }
+
+  private sizeOfSource(index: nodeIndex): number {
+    let size = 0;
+    this.props.graph.links.forEach(l => {
+      if (l.source === index) { size += l.value || 0 }
+    });
+
+    return size;
+  }
+
+  private sizeOfTarget(index: nodeIndex): number {
+    let size = 0;
+    this.props.graph.links.forEach(l => {
+      if (l.target === index) { size += l.value || 0 }
+    });
+
+    return size;
   }
 
   private handleSourceClick (index: nodeIndex) {
@@ -139,26 +163,10 @@ export default class Bipartite extends React.Component<BipartiteProps, Bipartite
     const { source, target } = link;
     const y1 = this.sourceHeight(source);
     const y2 = this.targetHeight(target);
+    const midX = this.width / 2;
+    const d = `M${x1},${y1} C${midX},${y1} ${midX},${y2} ${x2},${y2}`;
     return (
-      <line
-        {...{x1, x2, y1, y2}}
-        strokeWidth={link.value}
-        stroke="black"
-      />
-    );
-  }
-
-  private renderCircle(pos: Position, handleClick: () => void, isSelected: boolean) {
-    return (
-      <circle
-        cx={pos.x}
-        cy={pos.y}
-        r={this.padding - 1 - this.strokeWidth}
-        stroke="black"
-        strokeWidth="2"
-        onClick={handleClick}
-        fill={isSelected ? 'gray' : 'white'}
-      />
+      <path d={d} fill="none" stroke="black" strokeWidth={link.value}/>
     );
   }
 }

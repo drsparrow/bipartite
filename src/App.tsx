@@ -11,6 +11,7 @@ const links = [
   {source: 2, target: 1, value: 2},
   {source: 3, target: 2, value: 1},
   {source: 4, target: 0, value: 5},
+  {source: 4, target: 2, value: 5},
 ];
 
 const graph: BGraph = {sources, targets, links};
@@ -18,7 +19,9 @@ const graph: BGraph = {sources, targets, links};
 class App extends React.Component {
   render() {
     return (
-      <Bipartite graph={graph}/>
+      <div className='App'>
+        <Bipartite graph={graph}/>
+      </div>
     );
   }
 }
