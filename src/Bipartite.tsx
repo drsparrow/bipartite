@@ -5,39 +5,39 @@ import BNode from './BNode';
 type BasicNode = string;
 type nodeIndex = number;
 
-export interface BLink<DataType={}> {
+export interface IBLink<DataType={}> {
   source: nodeIndex;
   target: nodeIndex;
   value?: number;
   data?: DataType;
 }
 
-export interface BGraph<NodeType=BasicNode, LinkType={}> {
+export interface IBGraph<NodeType=BasicNode, LinkType={}> {
   sources: NodeType[];
   targets: NodeType[];
-  links: BLink<LinkType>[];
+  links: IBLink<LinkType>[];
 }
 
-export interface BipartiteProps<NodeType={}, LinkType={}, DataType={}> {
-  graph: BGraph<NodeType, LinkType>;
+export interface IBipartiteProps<NodeType={}, LinkType={}, DataType={}> {
+  graph: IBGraph<NodeType, LinkType>;
   data?: DataType;
 }
 
-export interface BipartiteState {
+export interface IBipartiteState {
   selectedSources: Set;
   selectedTargets: Set;
 }
 
 export type NodePosition = {x: number, y: number};
 
-export default class Bipartite extends React.Component<BipartiteProps, BipartiteState> {
+export default class Bipartite extends React.Component<IBipartiteProps, IBipartiteState> {
   private height = 400;
   private width = 700;
   private padding = 10;
   private x1 = this.padding;
   private x2 = this.width - this.padding;
 
-  constructor (props: BipartiteProps) {
+  constructor (props: IBipartiteProps) {
     super(props);
     this.state = {
       selectedSources: new Set(),
@@ -158,7 +158,7 @@ export default class Bipartite extends React.Component<BipartiteProps, Bipartite
     );
   }
 
-  private renderLink (link: BLink) {
+  private renderLink (link: IBLink) {
     const { x1, x2 } = this;
     const { source, target } = link;
     const y1 = this.sourceHeight(source);

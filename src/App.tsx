@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './App.css';
-import Bipartite, { BGraph } from './Bipartite';
+import Bipartite, { IBGraph } from './Bipartite';
 
 const sources = ['a', 'b', 'c', 'd', 'e'];
 const targets = ['x', 'y', 'z'];
@@ -14,7 +14,7 @@ const links = [
   {source: 4, target: 2, value: 5},
 ];
 
-const graph: BGraph = {sources, targets, links};
+const graph: IBGraph = {sources, targets, links};
 
 class App extends React.Component {
   render() {
