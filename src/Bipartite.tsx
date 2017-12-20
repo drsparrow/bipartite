@@ -112,7 +112,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const height = this.sizeOfSource(index);
     const onClick = () => this.handleSourceClick(index);
     const isSelected = this.state.selectedSources.includes(index);
-    return <BNode {...{height, pos, onClick, isSelected}}/>
+    return <BNode {...{height, pos, onClick, isSelected}} key={index}/>
   }
 
   private renderTargetNode(index: nodeIndex) {
@@ -120,7 +120,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const height = this.sizeOfTarget(index);
     const onClick = () => this.handleTargetClick(index);
     const isSelected = this.state.selectedTargets.includes(index);
-    return <BNode {...{height, pos, onClick, isSelected}}/>
+    return <BNode {...{height, pos, onClick, isSelected}} key={index}/>
   }
 
   private sizeOfSource(index: nodeIndex): number {
@@ -170,7 +170,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const {tightness} = state;
     const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value/2;
     const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value/2;
-    return <BLink {...{value, x1, x2, y1, y2, tightness}}/>;
+    return <BLink {...{value, x1, x2, y1, y2, tightness}} key={`${source}-${target}`}/>;
   }
 
   private sourceOffset (link: IBLink): number {
