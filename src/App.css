@@ -5,3 +5,7 @@ body {
 .Bipartite {
   border: 2px solid black;
 }
+
+.BLink:hover {
+  stroke: blue;
+}

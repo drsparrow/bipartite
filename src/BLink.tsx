@@ -13,6 +13,6 @@ export default function BLink (props: Props) {
   const midX = (x1 + x2) / 2;
   const d = `M${x1},${y1} C${midX},${y1} ${midX},${y2} ${x2},${y2}`;
   return (
-    <path d={d} fill="none" stroke="black" strokeWidth={value || 1}/>
+    <path className="BLink" d={d} fill="none" stroke="black" strokeWidth={value || 1}/>
   );
 }
