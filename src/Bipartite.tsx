@@ -160,10 +160,26 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderLink (link: IBLink) {
+    const sourceLinks = this.props.graph.links.filter(l => l.source === link.source).sort((a,b) => a.target - b.target);
+    let sourceOffset = 0;
+    sourceLinks.some(l => {
+      if (link === l) { return true }
+      sourceOffset += l.value || 0;
+      return false;
+    });
+
+    const targetLinks = this.props.graph.links.filter(l => l.target === link.target).sort((a,b) => a.target - b.target);
+    let targetOffset = 0;
+    targetLinks.some(l => {
+      if (link === l) { return true }
+      targetOffset += l.value || 0;
+      return false;
+    });
+
     const { x1, x2 } = this;
     const { source, target, value } = link;
-    const y1 = this.sourceHeight(source);
-    const y2 = this.targetHeight(target);
+    const y1 = this.sourceHeight(source) + sourceOffset + (link.value || 0)/2;
+    const y2 = this.targetHeight(target) + targetOffset + (link.value || 0)/2;;
     return <BLink {...{value, x1, x2, y1, y2}}/>;
   }
 }
