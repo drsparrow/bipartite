@@ -5,7 +5,7 @@ interface Props {
   x2: number;
   y1: number;
   y2: number;
-  value?: number;
+  value: number;
   tightness: number;
 }
 
@@ -16,6 +16,6 @@ export default function BLink (props: Props) {
   const midX2 = midX - (tightness * midX)
   const d = `M${x1},${y1} C${midX1},${y1} ${midX2},${y2} ${x2},${y2}`;
   return (
-    <path className="BLink" d={d} fill="none" stroke="black" strokeWidth={value || 1}/>
+    <path className="BLink" d={d} fill="none" stroke="black" strokeWidth={value}/>
   );
 }
