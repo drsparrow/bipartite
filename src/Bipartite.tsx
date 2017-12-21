@@ -77,16 +77,27 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private sourceHeight(index: nodeIndex) {
-    return this.indexToHeight(index, this.props.graph.sources.length);
+    let height = 0;
+    let sourceSpacing = this.sourceSpacing();
+
+    for (let i = 0; i < index; i++) {
+      height += this.valueOfLinks(this.linksWithSource(i));
+      height += sourceSpacing;
+    }
+
+    return height;
   }
 
   private targetHeight(index: nodeIndex) {
-    return this.indexToHeight(index, this.props.graph.targets.length);
-  }
+    let height = 0;
+    let targetSpacing = this.targetSpacing();
 
-  private indexToHeight (index: nodeIndex, length: number) {
-    const step = this.height / (length + 1);
-    return step * (index + 1);
+    for (let i = 0; i < index; i++) {
+      height += this.valueOfLinks(this.linksWithTarget(i));
+      height += targetSpacing;
+    }
+
+    return height;
   }
 
   private renderSources () {
@@ -183,6 +194,14 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return this.offsetFromLinks(link, links);
   }
 
+  private linksWithSource(index: nodeIndex) {
+    return this.props.graph.links.filter(l => l.source === index);
+  }
+
+  private linksWithTarget(index: nodeIndex) {
+    return this.props.graph.links.filter(l => l.target === index);
+  }
+
   private offsetFromLinks (link: IBLink, links: IBLink[]) {
     let offset = 0;
     links.some(l => {
@@ -205,5 +224,23 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         onChange={(e) => {this.setState({tightness: +e.target.value})}}
       />
     );
+  }
+
+  private totalValue (): number {
+    return this.valueOfLinks(this.props.graph.links);
+  }
+
+  private valueOfLinks(links: IBLink[]): number {
+    return links.reduce((acc,l) => acc + l.value, 0);
+  }
+
+  private sourceSpacing (): number {
+    const { height, props } = this;
+    return (height - this.totalValue()) / (props.graph.sources.length - 1);
+  }
+
+  private targetSpacing (): number {
+    const { height, props } = this;
+    return (height - this.totalValue()) / (props.graph.targets.length - 1);
   }
 }
