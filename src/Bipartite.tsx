@@ -37,6 +37,9 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private width = 700;
   private x1 = 0;
   private x2 = this.width;
+  private links = this.buildLinks();
+  private sources = this.props.graph.sources;
+  private targets = this.props.graph.targets;
 
   constructor (props: IBipartiteProps) {
     super(props);
@@ -102,19 +105,17 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderSources () {
-    const { sources } = this.props.graph;
     return (
       <g className="sources">
-        {sources.map((n, i) => this.renderSourceNode(i))}
+        {this.sources.map((n, i) => this.renderSourceNode(i))}
       </g>
     );
   }
 
   private renderTargets () {
-    const { targets } = this.props.graph;
     return (
       <g className="targets">
-        {targets.map((n, i) => this.renderTargetNode(i))}
+        {this.targets.map((n, i) => this.renderTargetNode(i))}
       </g>
     );
   }
@@ -137,7 +138,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private sizeOfSource(index: nodeIndex): number {
     let size = 0;
-    this.props.graph.links.forEach(l => {
+    this.links.forEach(l => {
       if (l.source === index) { size += l.value }
     });
 
@@ -146,7 +147,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private sizeOfTarget(index: nodeIndex): number {
     let size = 0;
-    this.props.graph.links.forEach(l => {
+    this.links.forEach(l => {
       if (l.target === index) { size += l.value }
     });
 
@@ -168,10 +169,9 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderLinks () {
-    const { links } = this.props.graph;
     return (
       <g className="links">
-        {links.map(l => this.renderLink(l))}
+        {this.links.map(l => this.renderLink(l))}
       </g>
     );
   }
@@ -186,21 +186,21 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private sourceOffset (link: IBLink): number {
-    const links = this.linksWithSource(link.source).sort((a,b) => a.source - b.source);
+    const links = this.linksWithSource(link.source)
     return this.offsetFromLinks(link, links);
   }
 
   private targetOffset (link: IBLink): number {
-    const links = this.linksWithTarget(link.target).sort((a,b) => a.target - b.target);
+    const links = this.linksWithTarget(link.target)
     return this.offsetFromLinks(link, links);
   }
 
   private linksWithSource(index: nodeIndex) {
-    return this.props.graph.links.filter(l => l.source === index);
+    return this.links.filter(l => l.source === index);
   }
 
   private linksWithTarget(index: nodeIndex) {
-    return this.props.graph.links.filter(l => l.target === index);
+    return this.links.filter(l => l.target === index);
   }
 
   private offsetFromLinks (link: IBLink, links: IBLink[]) {
@@ -228,7 +228,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private totalValue (): number {
-    return this.valueOfLinks(this.props.graph.links);
+    return this.valueOfLinks(this.links);
   }
 
   private valueOfLinks(links: IBLink[]): number {
@@ -236,14 +236,23 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private sourceSpacing (): number {
-    return this.nodeSpacing(this.props.graph.sources);
+    return this.nodeSpacing(this.sources);
   }
 
   private targetSpacing (): number {
-    return this.nodeSpacing(this.props.graph.targets);
+    return this.nodeSpacing(this.targets);
   }
 
   private nodeSpacing (collection: any[]): number {
     return (this.height - this.totalValue()) / (collection.length - 1);
+  }
+
+  private buildLinks (): IBLink[] {
+    const { links } = this.props.graph;
+    return links.sort((a, b) => {
+      const diff = a.source - b.source;
+      if (diff) { return diff }
+      return a.target - b.target;
+    });
   }
 }
