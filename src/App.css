@@ -2,8 +2,10 @@ body {
   text-align: center;
 }
 
-.Bipartite {
+.Bipartite .svg-container {
   border: 2px solid black;
+  padding: 30px;
+  display: inline-block;
 }
 
 .BLink {

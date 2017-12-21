@@ -8,6 +8,8 @@ interface Props {
   isSelected: boolean;
 }
 
+export const NODE_WIDTH = 10;
+
 export default function BNode (props: Props) {
   const {pos, height, onClick, isSelected} = props;
   const {x, y} = pos;
@@ -16,8 +18,8 @@ export default function BNode (props: Props) {
       {...{x, y, height, onClick}}
       x={pos.x}
       y={pos.y}
-      width="10"
-      fill={isSelected ? 'gray' : 'red'}
+      width={NODE_WIDTH}
+      fill={isSelected ? 'blue' : 'red'}
     />
   );
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Set from './set';
-import BNode from './BNode';
+import BNode, {NODE_WIDTH} from './BNode';
 import BLink from './BLink';
 
 type BasicNode = string;
@@ -35,9 +35,8 @@ export type NodePosition = {x: number, y: number};
 export default class Bipartite extends React.Component<IBipartiteProps, IBipartiteState> {
   private height = 400;
   private width = 700;
-  private padding = 10;
-  private x1 = this.padding;
-  private x2 = this.width - this.padding;
+  private x1 = 0;
+  private x2 = this.width;
 
   constructor (props: IBipartiteProps) {
     super(props);
@@ -53,11 +52,13 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <div className="Bipartite">
         {this.slider()}
-        <svg {...{width, height}} xmlns="http://www.w3.org/2000/svg">
-          {this.renderLinks()}
-          {this.renderSources()}
-          {this.renderTargets()}
-        </svg>
+        <span className="svg-container">
+          <svg {...{width, height}} xmlns="http://www.w3.org/2000/svg">
+            {this.renderLinks()}
+            {this.renderSources()}
+            {this.renderTargets()}
+          </svg>
+        </span>
       </div>
     );
   }
@@ -71,7 +72,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private targetPosition (index: nodeIndex): NodePosition {
     return {
-      x: this.x2,
+      x: this.x2 - NODE_WIDTH,
       y: this.targetHeight(index)
     };
   }
