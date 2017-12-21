@@ -236,12 +236,14 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private sourceSpacing (): number {
-    const { height, props } = this;
-    return (height - this.totalValue()) / (props.graph.sources.length - 1);
+    return this.nodeSpacing(this.props.graph.sources);
   }
 
   private targetSpacing (): number {
-    const { height, props } = this;
-    return (height - this.totalValue()) / (props.graph.targets.length - 1);
+    return this.nodeSpacing(this.props.graph.targets);
+  }
+
+  private nodeSpacing (collection: any[]): number {
+    return (this.height - this.totalValue()) / (collection.length - 1);
   }
 }
