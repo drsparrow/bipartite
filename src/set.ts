@@ -1,5 +1,5 @@
 export default class Set {
-  protected store: {[number: number]: boolean} = {};
+  protected store: {[num: number]: boolean} = {};
 
   constructor (elements: number[] = []) {
     elements.forEach(e => this.store[e] = true);
