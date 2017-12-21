@@ -6,6 +6,10 @@ body {
   border: 2px solid black;
 }
 
+.BLink {
+  opacity: 0.5;
+}
+
 .BLink:hover {
-  stroke: blue;
+  opacity: 1;
 }
