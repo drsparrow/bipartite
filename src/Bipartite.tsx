@@ -186,12 +186,12 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private sourceOffset (link: IBLink): number {
-    const links = this.props.graph.links.filter(l => l.source === link.source).sort((a,b) => a.target - b.target);
+    const links = this.linksWithSource(link.source).sort((a,b) => a.source - b.source);
     return this.offsetFromLinks(link, links);
   }
 
   private targetOffset (link: IBLink): number {
-    const links = this.props.graph.links.filter(l => l.target === link.target).sort((a,b) => a.target - b.target);
+    const links = this.linksWithTarget(link.target).sort((a,b) => a.target - b.target);
     return this.offsetFromLinks(link, links);
   }
 
