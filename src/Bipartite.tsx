@@ -34,6 +34,13 @@ export interface IBipartiteState {
 export type NodePosition = {x: number, y: number};
 
 export default class Bipartite extends React.Component<IBipartiteProps, IBipartiteState> {
+
+  public state = {
+    selectedSources: new Set(),
+    selectedTargets: new Set(),
+    tightness: 0
+  };
+
   private height = 400;
   private width = 700;
   private x1 = 0;
@@ -41,15 +48,6 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private links = this.buildLinks();
   private sources = this.props.graph.sources;
   private targets = this.props.graph.targets;
-
-  constructor (props: IBipartiteProps) {
-    super(props);
-    this.state = {
-      selectedSources: new Set(),
-      selectedTargets: new Set(),
-      tightness: 0
-    };
-  }
 
   public render () {
     const {width, height} = this;
