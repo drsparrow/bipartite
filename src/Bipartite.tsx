@@ -6,6 +6,7 @@ import ClearButton from './ClearButton';
 
 type BasicNode = string;
 type nodeIndex = number;
+type NSet = Set<number>;
 
 export interface IBLink<DataType = {}> {
   source: nodeIndex;
@@ -26,8 +27,8 @@ export interface IBipartiteProps<NodeType = {}, LinkType = {}, DataType = {}> {
 }
 
 export interface IBipartiteState {
-  selectedSources: Set;
-  selectedTargets: Set;
+  selectedSources: NSet;
+  selectedTargets: NSet;
   tightness: number;
 }
 
@@ -36,8 +37,8 @@ export type NodePosition = {x: number, y: number};
 export default class Bipartite extends React.Component<IBipartiteProps, IBipartiteState> {
 
   public state = {
-    selectedSources: new Set(),
-    selectedTargets: new Set(),
+    selectedSources: nSet(),
+    selectedTargets: nSet(),
     tightness: 0
   };
 
@@ -266,7 +267,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
       <ClearButton
         setSize={this.state.selectedSources.size()}
         setValue={setValue}
-        onClick={() => this.setState({selectedSources: new Set()})}
+        onClick={() => this.setState({selectedSources: nSet()})}
         className="float-left"
       />
     );
@@ -282,9 +283,11 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
       <ClearButton
         setSize={selectedTargets.size()}
         setValue={setValue}
-        onClick={() => this.setState({selectedTargets: new Set()})}
+        onClick={() => this.setState({selectedTargets: nSet()})}
         className="float-right"
       />
     );
   }
 }
+
+const nSet = Set.emptySet<number>();

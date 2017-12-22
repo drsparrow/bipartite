@@ -1,23 +1,28 @@
-export default class Set {
-  protected store: {[num: number]: boolean} = {};
+const {parse, stringify} = JSON;
 
-  constructor (elements: number[] = []) {
-    elements.forEach(e => this.store[e] = true);
+export default class Set<T> {
+  protected store: {[key: string]: boolean} = {}
+
+  static emptySet = <T>() => () => new Set<T>();
+
+  constructor (elements: T[] = []) {
+    elements.forEach(e => this.store[stringify(e)] = true);
   }
 
-  public toggle(e: number): this {
-    this.store[e] ? delete this.store[e] : this.store[e] = true;
+  public toggle(e: T): this {
+    const key = stringify(e);
+    this.store[key] ? delete this.store[key] : this.store[key] = true;
     return this;
   }
 
-  public toggleAndCopy(e: number): Set {
-    const copy = new Set;
+  public toggleAndCopy(e: T): Set<T> {
+    const copy = new Set<T>();
     copy.store = {...this.store};
     return copy.toggle(e);
   }
 
-  public includes(e: number): boolean {
-    return !!this.store[e];
+  public includes(e: T): boolean {
+    return !!this.store[stringify(e)];
   }
 
   public isEmpty (): boolean {
@@ -28,7 +33,11 @@ export default class Set {
     return this.toArray().length;
   }
 
-  public toArray (): number[] {
-    return Object.keys(this.store).map(e => parseInt(e));
+  public toArray (): T[] {
+    return this.keys().map(e => parse(e) as T);
+  }
+
+  private keys (): string[] {
+    return Object.keys(this.store);
   }
 }
