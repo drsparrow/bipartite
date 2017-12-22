@@ -16,10 +16,10 @@ export default function BNode (props: Props) {
   return (
     <rect
       {...{x, y, height, onClick}}
+      className={`BNode ${isSelected ? 'selected' : ''}`}
       x={pos.x}
       y={pos.y}
       width={NODE_WIDTH}
-      fill={isSelected ? 'blue' : 'red'}
     />
   );
 }

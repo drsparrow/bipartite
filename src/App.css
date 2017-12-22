@@ -8,6 +8,14 @@ body {
   display: inline-block;
 }
 
+.BNode {
+  fill: red;
+}
+
+.BNode.selected {
+  fill: blue;
+}
+
 .BLink {
   opacity: 0.5;
 }
