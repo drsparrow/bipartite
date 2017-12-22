@@ -86,7 +86,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     let sourceSpacing = this.sourceSpacing();
 
     for (let i = 0; i < index; i++) {
-      height += this.valueOfLinks(this.linksWithSource(i));
+      height += this.sizeOfSource(i);
       height += sourceSpacing;
     }
 
@@ -98,7 +98,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     let targetSpacing = this.targetSpacing();
 
     for (let i = 0; i < index; i++) {
-      height += this.valueOfLinks(this.linksWithTarget(i));
+      height += this.sizeOfTarget(i);
       height += targetSpacing;
     }
 
