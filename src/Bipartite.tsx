@@ -2,6 +2,7 @@ import * as React from 'react';
 import Set from './set';
 import BNode, {NODE_WIDTH} from './BNode';
 import BLink from './BLink';
+import ClearButton from './ClearButton';
 
 type BasicNode = string;
 type nodeIndex = number;
@@ -55,12 +56,14 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <div className="Bipartite">
         {this.slider()}
+        <br/>
         <span className="svg-container">
           <svg {...{width, height}} xmlns="http://www.w3.org/2000/svg">
             {this.renderLinks()}
             {this.renderSources()}
             {this.renderTargets()}
           </svg>
+          {this.renderButtons()}
         </span>
       </div>
     );
@@ -256,5 +259,34 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
       if (diff) { return diff }
       return a.target - b.target;
     });
+  }
+
+  private renderButtons () {
+    return (
+      <div>
+        {this.renderSourceButton()}
+        {this.renderTargetButton()}
+      </div>
+    );
+  }
+
+  private renderSourceButton() {
+    return (
+      <ClearButton
+        setSize={this.state.selectedSources.size()}
+        onClick={() => this.setState({selectedSources: new Set()})}
+        className="float-left"
+      />
+    );
+  }
+
+  private renderTargetButton() {
+    return (
+      <ClearButton
+        setSize={this.state.selectedTargets.size()}
+        onClick={() => this.setState({selectedTargets: new Set()})}
+        className="float-right"
+      />
+    );
   }
 }

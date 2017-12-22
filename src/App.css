@@ -31,3 +31,11 @@ body {
 .BLink.selected:hover {
   opacity: 0.9;
 }
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}

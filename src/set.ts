@@ -19,4 +19,12 @@ export default class Set {
   public includes(e: number): boolean {
     return !!this.store[e];
   }
+
+  public isEmpty (): boolean {
+    return this.size() === 0;
+  }
+
+  public size (): number {
+    return Object.keys(this.store).length
+  }
 }
