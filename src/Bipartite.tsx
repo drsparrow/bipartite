@@ -179,10 +179,12 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderLink (link: IBLink) {
     const { x1, x2, state } = this;
     const { source, target, value } = link;
+    const { selectedSources, selectedTargets } = state;
     const {tightness} = state;
     const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value/2;
     const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value/2;
-    return <BLink {...{value, x1, x2, y1, y2, tightness}} key={`${source}-${target}`}/>;
+    const isSelected = selectedSources.includes(source) || selectedTargets.includes(target)
+    return <BLink {...{value, x1, x2, y1, y2, tightness, isSelected}} key={`${source}-${target}`}/>;
   }
 
   private sourceOffset (link: IBLink): number {

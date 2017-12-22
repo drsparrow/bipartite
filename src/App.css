@@ -20,6 +20,10 @@ body {
   opacity: 0.5;
 }
 
+.BLink.selected {
+  opacity: 0.8;
+}
+
 .BLink:hover {
   opacity: 1;
 }
