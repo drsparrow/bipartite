@@ -140,21 +140,11 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private sizeOfSource(index: nodeIndex): number {
-    let size = 0;
-    this.links.forEach(l => {
-      if (l.source === index) { size += l.value; }
-    });
-
-    return size;
+    return this.valueOfLinks(this.linksWithSource(index));
   }
 
   private sizeOfTarget(index: nodeIndex): number {
-    let size = 0;
-    this.links.forEach(l => {
-      if (l.target === index) { size += l.value; }
-    });
-
-    return size;
+    return this.valueOfLinks(this.linksWithTarget(index));
   }
 
   private handleSourceClick (index: nodeIndex) {
