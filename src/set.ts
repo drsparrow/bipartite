@@ -25,6 +25,10 @@ export default class Set {
   }
 
   public size (): number {
-    return Object.keys(this.store).length;
+    return this.toArray().length;
+  }
+
+  public toArray (): number[] {
+    return Object.keys(this.store).map(e => parseInt(e));
   }
 }

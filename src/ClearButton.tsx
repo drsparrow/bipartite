@@ -4,15 +4,16 @@ interface Props {
   onClick: () => void;
   className: string;
   setSize: number;
+  setValue: number;
 }
 
 export default function ClearButton (props: Props) {
-  const {onClick, className, setSize} = props;
+  const {onClick, className, setSize, setValue} = props;
   const disabled = setSize === 0;
 
   return (
     <span className={className}>
-      <div>{setSize} nodes selected</div>
+      <div>{setSize} nodes selected (wt. {setValue})</div>
       <button {...{onClick, disabled, className}}>clear</button>
     </span>
   );

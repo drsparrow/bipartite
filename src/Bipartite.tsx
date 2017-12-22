@@ -257,9 +257,15 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderSourceButton() {
+    const { selectedSources } = this.state;
+    const setValue = selectedSources.toArray().reduce((acc, n) =>
+      acc + this.sizeOfSource(n)
+    , 0);
+
     return (
       <ClearButton
         setSize={this.state.selectedSources.size()}
+        setValue={setValue}
         onClick={() => this.setState({selectedSources: new Set()})}
         className="float-left"
       />
@@ -267,9 +273,15 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderTargetButton() {
+    const { selectedTargets } = this.state;
+    const setValue = selectedTargets.toArray().reduce((acc, n) =>
+      acc + this.sizeOfTarget(n)
+    , 0);
+
     return (
       <ClearButton
-        setSize={this.state.selectedTargets.size()}
+        setSize={selectedTargets.size()}
+        setValue={setValue}
         onClick={() => this.setState({selectedTargets: new Set()})}
         className="float-right"
       />
