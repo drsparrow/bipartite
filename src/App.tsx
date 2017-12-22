@@ -26,7 +26,7 @@ const graph: IBGraph = {sources, targets, links};
 class App extends React.Component {
   render() {
     return (
-      <div className='App'>
+      <div className="App">
         <Bipartite graph={graph}/>
       </div>
     );

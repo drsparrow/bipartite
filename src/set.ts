@@ -25,6 +25,6 @@ export default class Set {
   }
 
   public size (): number {
-    return Object.keys(this.store).length
+    return Object.keys(this.store).length;
   }
 }

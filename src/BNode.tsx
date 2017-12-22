@@ -1,5 +1,5 @@
-import * as React from "react";
-import {NodePosition} from "./Bipartite";
+import * as React from 'react';
+import { NodePosition } from './Bipartite';
 
 interface Props {
   pos: NodePosition;

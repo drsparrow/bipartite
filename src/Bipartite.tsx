@@ -1,26 +1,26 @@
 import * as React from 'react';
 import Set from './set';
-import BNode, {NODE_WIDTH} from './BNode';
+import BNode, { NODE_WIDTH } from './BNode';
 import BLink from './BLink';
 import ClearButton from './ClearButton';
 
 type BasicNode = string;
 type nodeIndex = number;
 
-export interface IBLink<DataType={}> {
+export interface IBLink<DataType = {}> {
   source: nodeIndex;
   target: nodeIndex;
   value: number;
   data?: DataType;
 }
 
-export interface IBGraph<NodeType=BasicNode, LinkType={}> {
+export interface IBGraph<NodeType = BasicNode, LinkType = {}> {
   sources: NodeType[];
   targets: NodeType[];
   links: IBLink<LinkType>[];
 }
 
-export interface IBipartiteProps<NodeType={}, LinkType={}, DataType={}> {
+export interface IBipartiteProps<NodeType = {}, LinkType = {}, DataType = {}> {
   graph: IBGraph<NodeType, LinkType>;
   data?: DataType;
 }
@@ -48,7 +48,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
       selectedSources: new Set(),
       selectedTargets: new Set(),
       tightness: 0
-    }
+    };
   }
 
   public render () {
@@ -128,7 +128,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const height = this.sizeOfSource(index);
     const onClick = () => this.handleSourceClick(index);
     const isSelected = this.state.selectedSources.includes(index);
-    return <BNode {...{height, pos, onClick, isSelected}} key={index}/>
+    return <BNode {...{height, pos, onClick, isSelected}} key={index}/>;
   }
 
   private renderTargetNode(index: nodeIndex) {
@@ -136,13 +136,13 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const height = this.sizeOfTarget(index);
     const onClick = () => this.handleTargetClick(index);
     const isSelected = this.state.selectedTargets.includes(index);
-    return <BNode {...{height, pos, onClick, isSelected}} key={index}/>
+    return <BNode {...{height, pos, onClick, isSelected}} key={index}/>;
   }
 
   private sizeOfSource(index: nodeIndex): number {
     let size = 0;
     this.links.forEach(l => {
-      if (l.source === index) { size += l.value }
+      if (l.source === index) { size += l.value; }
     });
 
     return size;
@@ -151,24 +151,22 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private sizeOfTarget(index: nodeIndex): number {
     let size = 0;
     this.links.forEach(l => {
-      if (l.target === index) { size += l.value }
+      if (l.target === index) { size += l.value; }
     });
 
     return size;
   }
 
   private handleSourceClick (index: nodeIndex) {
-    this.setState(prevState => {
-      const {selectedSources} = prevState;
-      return {selectedSources: selectedSources.toggleAndCopy(index)}
-    });
+    this.setState(prevState => ({
+      selectedSources: prevState.selectedSources.toggleAndCopy(index)
+    }));
   }
 
   private handleTargetClick (index: nodeIndex) {
-    this.setState(prevState => {
-      const {selectedTargets} = prevState;
-      return {selectedTargets: selectedTargets.toggleAndCopy(index)}
-    });
+    this.setState(prevState => ({
+      selectedTargets: prevState.selectedTargets.toggleAndCopy(index)
+    }));
   }
 
   private renderLinks () {
@@ -184,19 +182,19 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const { source, target, value } = link;
     const { selectedSources, selectedTargets } = state;
     const {tightness} = state;
-    const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value/2;
-    const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value/2;
-    const isSelected = selectedSources.includes(source) || selectedTargets.includes(target)
+    const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value / 2;
+    const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value / 2;
+    const isSelected = selectedSources.includes(source) || selectedTargets.includes(target);
     return <BLink {...{value, x1, x2, y1, y2, tightness, isSelected}} key={`${source}-${target}`}/>;
   }
 
   private sourceOffset (link: IBLink): number {
-    const links = this.linksWithSource(link.source)
+    const links = this.linksWithSource(link.source);
     return this.offsetFromLinks(link, links);
   }
 
   private targetOffset (link: IBLink): number {
-    const links = this.linksWithTarget(link.target)
+    const links = this.linksWithTarget(link.target);
     return this.offsetFromLinks(link, links);
   }
 
@@ -211,7 +209,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private offsetFromLinks (link: IBLink, links: IBLink[]) {
     let offset = 0;
     links.some(l => {
-      if (link === l) { return true }
+      if (link === l) { return true; }
       offset += l.value;
       return false;
     });
@@ -227,7 +225,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         max="0"
         value={this.state.tightness}
         step="0.01"
-        onChange={(e) => {this.setState({tightness: +e.target.value})}}
+        onChange={(e) => this.setState({tightness: +e.target.value})}
       />
     );
   }
@@ -237,7 +235,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private valueOfLinks(links: IBLink[]): number {
-    return links.reduce((acc,l) => acc + l.value, 0);
+    return links.reduce((acc, l) => acc + l.value, 0);
   }
 
   private sourceSpacing (): number {
@@ -248,7 +246,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return this.nodeSpacing(this.targets);
   }
 
-  private nodeSpacing (collection: any[]): number {
+  private nodeSpacing (collection: {}[]): number {
     return (this.height - this.totalValue()) / (collection.length - 1);
   }
 
@@ -256,7 +254,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const { links } = this.props.graph;
     return links.sort((a, b) => {
       const diff = a.source - b.source;
-      if (diff) { return diff }
+      if (diff) { return diff; }
       return a.target - b.target;
     });
   }
