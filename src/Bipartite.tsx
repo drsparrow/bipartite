@@ -304,6 +304,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <ClearButton
         setSize={this.state.selectedSources.size()}
+        totalSize={this.sources.length}
         setValue={setValue}
         onClick={() => this.setState({selectedSources: nSet()})}
         className="float-left"
@@ -319,6 +320,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <ClearButton
         setSize={selectedTargets.size()}
+        totalSize={this.targets.length}
         setValue={setValue}
         onClick={() => this.setState({selectedTargets: nSet()})}
         className="float-right"
