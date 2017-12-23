@@ -93,7 +93,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     let sourceSpacing = this.sourceSpacing();
 
     for (let i = 0; i < index; i++) {
-      height += this.sizeOfSource(i);
+      height += this.valueOfSource(i);
       height += sourceSpacing;
     }
 
@@ -105,7 +105,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     let targetSpacing = this.targetSpacing();
 
     for (let i = 0; i < index; i++) {
-      height += this.sizeOfTarget(i);
+      height += this.valueOfTarget(i);
       height += targetSpacing;
     }
 
@@ -130,7 +130,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private renderSourceNode(index: nodeIndex) {
     const pos = this.sourcePosition(index);
-    const height = this.sizeOfSource(index);
+    const height = this.valueOfSource(index);
     const onClick = () => this.handleSourceClick(index);
     const isSelected = this.state.selectedSources.includes(index);
     return <BNode {...{height, pos, onClick, isSelected}} key={index}/>;
@@ -138,17 +138,17 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private renderTargetNode(index: nodeIndex) {
     const pos = this.targetPosition(index);
-    const height = this.sizeOfTarget(index);
+    const height = this.valueOfTarget(index);
     const onClick = () => this.handleTargetClick(index);
     const isSelected = this.state.selectedTargets.includes(index);
     return <BNode {...{height, pos, onClick, isSelected}} key={index}/>;
   }
 
-  private sizeOfSource(index: nodeIndex): number {
+  private valueOfSource(index: nodeIndex): number {
     return this.valueOfLinks(this.linksWithSource(index));
   }
 
-  private sizeOfTarget(index: nodeIndex): number {
+  private valueOfTarget(index: nodeIndex): number {
     return this.valueOfLinks(this.linksWithTarget(index));
   }
 
@@ -299,7 +299,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderSourceButton() {
     const { selectedSources } = this.state;
     const setValue = selectedSources.toArray()
-      .reduce((acc, n) => acc + this.sizeOfSource(n), 0);
+      .reduce((acc, n) => acc + this.valueOfSource(n), 0);
 
     return (
       <ClearButton
@@ -316,7 +316,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderTargetButton() {
     const { selectedTargets } = this.state;
     const setValue = selectedTargets.toArray()
-      .reduce((acc, n) => acc + this.sizeOfTarget(n), 0);
+      .reduce((acc, n) => acc + this.valueOfTarget(n), 0);
 
     return (
       <ClearButton
