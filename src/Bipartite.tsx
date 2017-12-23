@@ -3,6 +3,7 @@ import Set from './set';
 import BNode, { NODE_WIDTH } from './BNode';
 import BLink from './BLink';
 import ClearButton from './ClearButton';
+import ColorSlider from './ColorSlider';
 
 type BasicNode = string;
 type nodeIndex = number;
@@ -35,7 +36,8 @@ export interface IBipartiteState {
   selectedTargets: NSet;
   selectedLinks: LSet;
   tightness: number;
-  colorVal: number;
+  sourceColorVal: number;
+  targetColorVal: number;
 }
 
 export type NodePosition = {x: number, y: number};
@@ -46,7 +48,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     selectedSources: nSet(),
     selectedTargets: nSet(),
     selectedLinks: lSet(),
-    colorVal: 0,
+    sourceColorVal: 0,
+    targetColorVal: 180,
     tightness: 0
   };
 
@@ -63,7 +66,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <div className="Bipartite">
         {this.tightnessSlider()}
-        {this.colorSlider()}
+        {this.sourceColorSlider()}
+        {this.targetColorSlider()}
         <br/>
         <span className="svg-container">
           <svg {...{width, height}} xmlns="http://www.w3.org/2000/svg">
@@ -133,7 +137,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderSourceNode(index: nodeIndex) {
-    const color = this.getColor();
+    const color = this.getSourceColor();
     const pos = this.sourcePosition(index);
     const height = this.valueOfSource(index);
     const onClick = () => this.handleSourceClick(index);
@@ -142,7 +146,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderTargetNode(index: nodeIndex) {
-    const color = this.getColor();
+    const color = this.getTargetColor();
     const pos = this.targetPosition(index);
     const height = this.valueOfTarget(index);
     const onClick = () => this.handleTargetClick(index);
@@ -257,15 +261,20 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     );
   }
 
-  private colorSlider () {
+  private sourceColorSlider () {
     return (
-      <input
-        type="range"
-        min="0"
-        max="360"
-        value={this.state.colorVal}
-        step="1"
-        onChange={(e) => this.setState({colorVal: +e.target.value})}
+      <ColorSlider
+        value={this.state.sourceColorVal}
+        onChange={(e: any) => this.setState({sourceColorVal: +e.target.value})}
+      />
+    );
+  }
+
+  private targetColorSlider () {
+    return (
+      <ColorSlider
+        value={this.state.targetColorVal}
+        onChange={(e: any) => this.setState({targetColorVal: +e.target.value})}
       />
     );
   }
@@ -358,29 +367,36 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private colorDefs() {
-    const color = this.getColor();
+    const sourceColor = this.getSourceColor();
+    const targetColor = this.getTargetColor();
     return (
       <defs>
         <linearGradient id="left-highlighted">
-            <stop offset="0%" stop-color={color}/>
+            <stop offset="0%" stop-color={sourceColor}/>
             <stop offset="100%" stop-color="black"/>
         </linearGradient>
         <linearGradient id="right-highlighted">
             <stop offset="0%" stop-color="black"/>
-            <stop offset="100%" stop-color={color}/>
+            <stop offset="100%" stop-color={targetColor}/>
         </linearGradient>
         <linearGradient id="both-highlighted">
-            <stop offset="0%" stop-color={color}/>
-            <stop offset="100%" stop-color={color}/>
+            <stop offset="0%" stop-color={sourceColor}/>
+            <stop offset="100%" stop-color={targetColor}/>
         </linearGradient>
       </defs>
     )
   }
 
-  private getColor(): string {
-    return `hsl(${this.state.colorVal}, 100%, 50%)`;
+  private getSourceColor(): string {
+    return colorValToHsl(this.state.sourceColorVal);
+  }
+
+  private getTargetColor(): string {
+    return colorValToHsl(this.state.targetColorVal);
   }
 }
+
+const colorValToHsl = (val: number) => `hsl(${val}, 100%, 50%)`;
 
 const nSet = Set.emptySet<number>();
 const lSet = Set.emptySet<IBasicBLink>();
