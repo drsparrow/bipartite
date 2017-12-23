@@ -174,7 +174,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
           selectedSources: selectedSources.removeAndCopy(source),
           selectedTargets: selectedTargets.removeAndCopy(target),
           selectedLinks: selectedLinks.removeAndCopy(link),
-        }
+        };
       }
 
       return {selectedLinks: selectedLinks.toggleAndCopy(link), selectedSources, selectedTargets};
@@ -192,15 +192,28 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderLink (link: IBLink) {
     const { x1, x2, state } = this;
     const { source, target, value } = link;
-    const { selectedSources, selectedTargets, selectedLinks } = state;
     const {tightness} = state;
     const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value / 2;
     const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value / 2;
-    const isHighlighted = selectedSources.includes(source) || selectedTargets.includes(target) || selectedLinks.includes(link);
+    const isHighlighted = this.linkIsHighlighted(link);
     const key = `${source}-${target}`;
     const onClick = () => this.handleLinkClick(link);
 
-    return <BLink {...{value, x1, x2, y1, y2, tightness, isHighlighted, key, onClick}}/>
+    return (
+      <BLink
+        {...{value, x1, x2, y1, y2, tightness, isHighlighted, key, onClick}}
+      />
+    );
+  }
+
+  private linkIsHighlighted (link: IBLink) {
+    const {selectedLinks, selectedSources, selectedTargets} = this.state;
+    const {source, target} = link;
+    return (
+      selectedSources.includes(source) ||
+      selectedTargets.includes(target) ||
+      selectedLinks.includes(link)
+    );
   }
 
   private sourceOffset (link: IBLink): number {
@@ -285,9 +298,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private renderSourceButton() {
     const { selectedSources } = this.state;
-    const setValue = selectedSources.toArray().reduce((acc, n) =>
-      acc + this.sizeOfSource(n)
-    , 0);
+    const setValue = selectedSources.toArray()
+      .reduce((acc, n) => acc + this.sizeOfSource(n), 0);
 
     return (
       <ClearButton
@@ -301,9 +313,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private renderTargetButton() {
     const { selectedTargets } = this.state;
-    const setValue = selectedTargets.toArray().reduce((acc, n) =>
-      acc + this.sizeOfTarget(n)
-    , 0);
+    const setValue = selectedTargets.toArray()
+      .reduce((acc, n) => acc + this.sizeOfTarget(n), 0);
 
     return (
       <ClearButton

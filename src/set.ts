@@ -1,7 +1,7 @@
 const {parse, stringify} = JSON;
 
 export default class Set<T> {
-  protected store: {[key: string]: boolean} = {}
+  protected store: {[key: string]: boolean} = {};
 
   static emptySet = <T>() => () => new Set<T>();
 
