@@ -12,10 +12,10 @@ type LSet = Set<IBasicBLink>;
 interface IBasicBLink {
   source: nodeIndex;
   target: nodeIndex;
+  value: number; // evil. value should be in IBLink
 }
 
 export interface IBLink<DataType = {}> extends IBasicBLink {
-  value: number;
   data?: DataType;
 }
 
@@ -291,6 +291,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <div>
         {this.renderSourceButton()}
+        {this.renderLinksButton()}
         {this.renderTargetButton()}
       </div>
     );
@@ -326,6 +327,20 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         totalValue={this.totalValue()}
         onClick={() => this.setState({selectedTargets: nSet()})}
         className="float-right"
+      />
+    );
+  }
+
+  private renderLinksButton() {
+    const { selectedLinks } = this.state;
+    return (
+      <ClearButton
+        setSize={selectedLinks.size()}
+        totalSize={this.links.length}
+        setValue={this.valueOfLinks(selectedLinks.toArray())}
+        totalValue={this.totalValue()}
+        onClick={() => this.setState({selectedLinks: lSet()})}
+        className="selected-links"
       />
     );
   }

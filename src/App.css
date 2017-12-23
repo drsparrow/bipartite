@@ -39,3 +39,8 @@ body {
 .float-right {
   float: right;
 }
+
+.selected-links {
+  display: inline-block;
+  margin: auto;
+}
