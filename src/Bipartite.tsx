@@ -67,6 +67,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
             {this.renderLinks()}
             {this.renderSources()}
             {this.renderTargets()}
+            {this.colorDefs()}
           </svg>
           {this.renderButtons()}
         </span>
@@ -165,20 +166,9 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private handleLinkClick (link: IBLink) {
-    this.setState(prevState => {
-      const {selectedSources, selectedTargets, selectedLinks} = prevState;
-      const {source, target} = link;
-
-      if (selectedSources.includes(source) || selectedTargets.includes(target)) {
-        return {
-          selectedSources: selectedSources.removeAndCopy(source),
-          selectedTargets: selectedTargets.removeAndCopy(target),
-          selectedLinks: selectedLinks.removeAndCopy(link),
-        };
-      }
-
-      return {selectedLinks: selectedLinks.toggleAndCopy(link), selectedSources, selectedTargets};
-    });
+    this.setState(prevState => ({
+      selectedLinks: prevState.selectedLinks.toggleAndCopy(link)
+    }));
   }
 
   private renderLinks () {
@@ -195,25 +185,29 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const {tightness} = state;
     const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value / 2;
     const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value / 2;
-    const isHighlighted = this.linkIsHighlighted(link);
+    const isLeftHighlighted = this.linkIsLeftHighlighted(link);
+    const isRightHighlighted = this.linkIsRightHighlighted(link);
+    const isSelected = this.linkIsSelected(link);
     const key = `${source}-${target}`;
     const onClick = () => this.handleLinkClick(link);
 
     return (
       <BLink
-        {...{value, x1, x2, y1, y2, tightness, isHighlighted, key, onClick}}
+        {...{value, x1, x2, y1, y2, tightness, isLeftHighlighted, isRightHighlighted, isSelected, key, onClick}}
       />
     );
   }
 
-  private linkIsHighlighted (link: IBLink) {
-    const {selectedLinks, selectedSources, selectedTargets} = this.state;
-    const {source, target} = link;
-    return (
-      selectedSources.includes(source) ||
-      selectedTargets.includes(target) ||
-      selectedLinks.includes(link)
-    );
+  private linkIsLeftHighlighted (link: IBLink) {
+    return this.state.selectedSources.includes(link.source);
+  }
+
+  private linkIsRightHighlighted (link: IBLink) {
+    return this.state.selectedTargets.includes(link.target);
+  }
+
+  private linkIsSelected (link: IBLink) {
+    return this.state.selectedLinks.includes(link);
   }
 
   private sourceOffset (link: IBLink): number {
@@ -343,6 +337,21 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         className="selected-links"
       />
     );
+  }
+
+  private colorDefs() {
+    return (
+      <defs>
+        <linearGradient id="left-highlighted">
+            <stop offset="0%" stop-color="blue"/>
+            <stop offset="100%" stop-color="black"/>
+        </linearGradient>
+        <linearGradient id="right-highlighted">
+            <stop offset="0%" stop-color="black"/>
+            <stop offset="100%" stop-color="blue"/>
+        </linearGradient>
+      </defs>
+    )
   }
 }
 
