@@ -8,14 +8,6 @@ body {
   display: inline-block;
 }
 
-.BNode {
-  fill: black;
-}
-
-.BNode.selected {
-  fill: blue;
-}
-
 .BLink {
   opacity: 0.3;
   stroke: black;
@@ -42,7 +34,7 @@ body {
 }
 
 .BLink.left-highlighted.right-highlighted {
-  stroke: blue;
+  stroke: url(#both-highlighted);
 }
 
 .float-left {

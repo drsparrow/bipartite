@@ -35,6 +35,7 @@ export interface IBipartiteState {
   selectedTargets: NSet;
   selectedLinks: LSet;
   tightness: number;
+  color: string;
 }
 
 export type NodePosition = {x: number, y: number};
@@ -45,6 +46,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     selectedSources: nSet(),
     selectedTargets: nSet(),
     selectedLinks: lSet(),
+    color: "blue",
     tightness: 0
   };
 
@@ -130,19 +132,23 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderSourceNode(index: nodeIndex) {
+    const { state } = this;
+    const { color } = state;
     const pos = this.sourcePosition(index);
     const height = this.valueOfSource(index);
     const onClick = () => this.handleSourceClick(index);
-    const isSelected = this.state.selectedSources.includes(index);
-    return <BNode {...{height, pos, onClick, isSelected}} key={index}/>;
+    const isSelected = state.selectedSources.includes(index);
+    return <BNode {...{height, pos, onClick, isSelected, color}} key={index}/>;
   }
 
   private renderTargetNode(index: nodeIndex) {
+    const { state } = this;
+    const { color } = state;
     const pos = this.targetPosition(index);
     const height = this.valueOfTarget(index);
     const onClick = () => this.handleTargetClick(index);
     const isSelected = this.state.selectedTargets.includes(index);
-    return <BNode {...{height, pos, onClick, isSelected}} key={index}/>;
+    return <BNode {...{height, pos, onClick, isSelected, color}} key={index}/>;
   }
 
   private valueOfSource(index: nodeIndex): number {
@@ -343,12 +349,16 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <defs>
         <linearGradient id="left-highlighted">
-            <stop offset="0%" stop-color="blue"/>
+            <stop offset="0%" stop-color={this.state.color}/>
             <stop offset="100%" stop-color="black"/>
         </linearGradient>
         <linearGradient id="right-highlighted">
             <stop offset="0%" stop-color="black"/>
-            <stop offset="100%" stop-color="blue"/>
+            <stop offset="100%" stop-color={this.state.color}/>
+        </linearGradient>
+        <linearGradient id="both-highlighted">
+            <stop offset="0%" stop-color={this.state.color}/>
+            <stop offset="100%" stop-color={this.state.color}/>
         </linearGradient>
       </defs>
     )
