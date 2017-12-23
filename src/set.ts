@@ -41,3 +41,5 @@ export default class Set<T> {
     return Object.keys(this.store);
   }
 }
+
+export const emptySet = <T>() => { new Set<T>(); }

@@ -7,10 +7,14 @@ import ClearButton from './ClearButton';
 type BasicNode = string;
 type nodeIndex = number;
 type NSet = Set<number>;
+type LSet = Set<IBasicBLink>;
 
-export interface IBLink<DataType = {}> {
+interface IBasicBLink {
   source: nodeIndex;
   target: nodeIndex;
+}
+
+export interface IBLink<DataType = {}> extends IBasicBLink {
   value: number;
   data?: DataType;
 }
@@ -29,6 +33,7 @@ export interface IBipartiteProps<NodeType = {}, LinkType = {}, DataType = {}> {
 export interface IBipartiteState {
   selectedSources: NSet;
   selectedTargets: NSet;
+  selectedLinks: LSet;
   tightness: number;
 }
 
@@ -39,6 +44,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   public state = {
     selectedSources: nSet(),
     selectedTargets: nSet(),
+    selectedLinks: lSet(),
     tightness: 0
   };
 
@@ -291,3 +297,4 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 }
 
 const nSet = Set.emptySet<number>();
+const lSet = Set.emptySet<IBasicBLink>();
