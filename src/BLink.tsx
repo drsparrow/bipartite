@@ -20,12 +20,16 @@ export default function BLink (props: Props) {
   const midX2 = midX - (tightness * midX);
 
   const iota = y1 === y2 ? 0.001 : 0; // hack. linearGradient does not work with straight lines
-  const d = `M${x1},${y1} C${midX1},${y1+iota} ${midX2},${y2+iota} ${x2},${y2}`;
+  const d = `M${x1},${y1} C${midX1},${y1 + iota} ${midX2},${y2 + iota} ${x2},${y2}`;
+
+  let className = 'BLink';
+  className += isSelected ? ' selected' : '';
+  className += isRightHighlighted ? ' right-highlighted' : '';
+  className += isLeftHighlighted ? ' left-highlighted' : '';
 
   return (
     <path
-      {...{d, onClick}}
-      className={`BLink ${isSelected ? 'selected' : ''} ${isRightHighlighted ? 'right-highlighted' : ''}  ${isLeftHighlighted ? 'left-highlighted' : ''}`}
+      {...{d, onClick, className}}
       fill="none"
       strokeWidth={value}
     />

@@ -21,7 +21,7 @@ export default function BNode (props: Props) {
       x={pos.x}
       y={pos.y}
       width={NODE_WIDTH}
-      fill={isSelected ? color : "black"}
+      fill={isSelected ? color : 'black'}
     />
   );
 }

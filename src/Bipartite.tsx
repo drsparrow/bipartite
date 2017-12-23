@@ -256,7 +256,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         max="0"
         value={this.state.tightness}
         step="0.01"
-        onChange={(e) => this.setState({tightness: +e.target.value})}
+        onChange={e => this.setState({tightness: +e.target.value})}
       />
     );
   }
@@ -265,7 +265,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <ColorSlider
         value={this.state.sourceColorVal}
-        onChange={(e: any) => this.setState({sourceColorVal: +e.target.value})}
+        onChange={e => this.setState({sourceColorVal: +e.target.value})}
       />
     );
   }
@@ -274,7 +274,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <ColorSlider
         value={this.state.targetColorVal}
-        onChange={(e: any) => this.setState({targetColorVal: +e.target.value})}
+        onChange={e => this.setState({targetColorVal: +e.target.value})}
       />
     );
   }
@@ -372,19 +372,19 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return (
       <defs>
         <linearGradient id="left-highlighted">
-            <stop offset="0%" stop-color={sourceColor}/>
-            <stop offset="100%" stop-color="black"/>
+            <stop offset="0%" stopColor={sourceColor}/>
+            <stop offset="100%" stopColor="black"/>
         </linearGradient>
         <linearGradient id="right-highlighted">
-            <stop offset="0%" stop-color="black"/>
-            <stop offset="100%" stop-color={targetColor}/>
+            <stop offset="0%" stopColor="black"/>
+            <stop offset="100%" stopColor={targetColor}/>
         </linearGradient>
         <linearGradient id="both-highlighted">
-            <stop offset="0%" stop-color={sourceColor}/>
-            <stop offset="100%" stop-color={targetColor}/>
+            <stop offset="0%" stopColor={sourceColor}/>
+            <stop offset="100%" stopColor={targetColor}/>
         </linearGradient>
       </defs>
-    )
+    );
   }
 
   private getSourceColor(): string {
@@ -401,7 +401,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
       border: `${border} black`,
       borderLeft: `${border} ${this.getSourceColor()}`,
       borderRight: `${border} ${this.getTargetColor()}`,
-    }
+    };
   }
 }
 
