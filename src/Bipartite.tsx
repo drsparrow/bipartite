@@ -306,6 +306,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         setSize={this.state.selectedSources.size()}
         totalSize={this.sources.length}
         setValue={setValue}
+        totalValue={this.totalValue()}
         onClick={() => this.setState({selectedSources: nSet()})}
         className="float-left"
       />
@@ -322,6 +323,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         setSize={selectedTargets.size()}
         totalSize={this.targets.length}
         setValue={setValue}
+        totalValue={this.totalValue()}
         onClick={() => this.setState({selectedTargets: nSet()})}
         className="float-right"
       />

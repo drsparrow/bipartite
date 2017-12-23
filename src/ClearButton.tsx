@@ -6,15 +6,16 @@ interface Props {
   setSize: number;
   totalSize: number;
   setValue: number;
+  totalValue: number;
 }
 
 export default function ClearButton (props: Props) {
-  const {onClick, className, setSize, setValue, totalSize} = props;
+  const {onClick, className, setSize, setValue, totalSize, totalValue} = props;
   const disabled = setSize === 0;
 
   return (
     <span className={className}>
-      <div>{setSize} of {totalSize} selected (wt. {setValue})</div>
+      <div>{setSize} of {totalSize} selected (wt. {setValue} of {totalValue})</div>
       <button {...{onClick, disabled, className}}>clear</button>
     </span>
   );
