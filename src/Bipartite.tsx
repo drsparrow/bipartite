@@ -69,7 +69,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         {this.sourceColorSlider()}
         {this.targetColorSlider()}
         <br/>
-        <span className="svg-container">
+        <span className="svg-container" style={this.svgStyle()}>
           <svg {...{width, height}} xmlns="http://www.w3.org/2000/svg">
             {this.renderLinks()}
             {this.renderSources()}
@@ -393,6 +393,15 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private getTargetColor(): string {
     return colorValToHsl(this.state.targetColorVal);
+  }
+
+  private svgStyle() {
+    const border = '5px solid';
+    return {
+      border: `${border} black`,
+      borderLeft: `${border} ${this.getSourceColor()}`,
+      borderRight: `${border} ${this.getTargetColor()}`,
+    }
   }
 }
 
