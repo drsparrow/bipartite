@@ -7,11 +7,12 @@ interface Props {
   y2: number;
   value: number;
   tightness: number;
-  isSelected: boolean;
+  isHighlighted: boolean;
+  onClick: () => void;
 }
 
 export default function BLink (props: Props) {
-  const { x1, x2, y1, y2, value, tightness, isSelected } = props;
+  const { x1, x2, y1, y2, value, tightness, isHighlighted, onClick } = props;
   const midX = (x1 + x2) / 2;
   const midX1 = midX + (tightness * midX);
   const midX2 = midX - (tightness * midX);
@@ -19,8 +20,8 @@ export default function BLink (props: Props) {
 
   return (
     <path
-      className={`BLink ${isSelected ? 'selected' : ''}`}
-      d={d}
+      {...{d, onClick}}
+      className={`BLink ${isHighlighted ? 'selected' : ''}`}
       fill="none"
       stroke="black"
       strokeWidth={value}

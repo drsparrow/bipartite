@@ -164,6 +164,23 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     }));
   }
 
+  private handleLinkClick (link: IBLink) {
+    this.setState(prevState => {
+      const {selectedSources, selectedTargets, selectedLinks} = prevState;
+      const {source, target} = link;
+
+      if (selectedSources.includes(source) || selectedTargets.includes(target)) {
+        return {
+          selectedSources: selectedSources.removeAndCopy(source),
+          selectedTargets: selectedTargets.removeAndCopy(target),
+          selectedLinks: selectedLinks.removeAndCopy(link),
+        }
+      }
+
+      return {selectedLinks: selectedLinks.toggleAndCopy(link), selectedSources, selectedTargets};
+    });
+  }
+
   private renderLinks () {
     return (
       <g className="links">
@@ -175,12 +192,15 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderLink (link: IBLink) {
     const { x1, x2, state } = this;
     const { source, target, value } = link;
-    const { selectedSources, selectedTargets } = state;
+    const { selectedSources, selectedTargets, selectedLinks } = state;
     const {tightness} = state;
     const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value / 2;
     const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value / 2;
-    const isSelected = selectedSources.includes(source) || selectedTargets.includes(target);
-    return <BLink {...{value, x1, x2, y1, y2, tightness, isSelected}} key={`${source}-${target}`}/>;
+    const isHighlighted = selectedSources.includes(source) || selectedTargets.includes(target) || selectedLinks.includes(link);
+    const key = `${source}-${target}`;
+    const onClick = () => this.handleLinkClick(link);
+
+    return <BLink {...{value, x1, x2, y1, y2, tightness, isHighlighted, key, onClick}}/>
   }
 
   private sourceOffset (link: IBLink): number {

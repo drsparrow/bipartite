@@ -10,15 +10,15 @@ export default class Set<T> {
   }
 
   public toggle(e: T): this {
-    const key = stringify(e);
-    this.store[key] ? delete this.store[key] : this.store[key] = true;
-    return this;
+    return this.includes(e) ? this.remove(e) : this.add(e);
   }
 
   public toggleAndCopy(e: T): Set<T> {
-    const copy = new Set<T>();
-    copy.store = {...this.store};
-    return copy.toggle(e);
+    return this.copy().toggle(e);
+  }
+
+  public removeAndCopy(e: T): Set<T> {
+    return this.copy().remove(e);
   }
 
   public includes(e: T): boolean {
@@ -35,6 +35,22 @@ export default class Set<T> {
 
   public toArray (): T[] {
     return this.keys().map(e => parse(e) as T);
+  }
+
+  public add(e: T): this {
+    this.store[stringify(e)] = true;
+    return this;
+  }
+
+  public remove(e: T): this {
+    delete this.store[stringify(e)];
+    return this;
+  }
+
+  public copy () {
+    const copy = new Set<T>();
+    copy.store = {...this.store};
+    return copy;
   }
 
   private keys (): string[] {
