@@ -35,7 +35,7 @@ export interface IBipartiteState {
   selectedTargets: NSet;
   selectedLinks: LSet;
   tightness: number;
-  color: string;
+  colorVal: number;
 }
 
 export type NodePosition = {x: number, y: number};
@@ -46,7 +46,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     selectedSources: nSet(),
     selectedTargets: nSet(),
     selectedLinks: lSet(),
-    color: "blue",
+    colorVal: 0,
     tightness: 0
   };
 
@@ -62,7 +62,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const {width, height} = this;
     return (
       <div className="Bipartite">
-        {this.slider()}
+        {this.tightnessSlider()}
+        {this.colorSlider()}
         <br/>
         <span className="svg-container">
           <svg {...{width, height}} xmlns="http://www.w3.org/2000/svg">
@@ -132,18 +133,16 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private renderSourceNode(index: nodeIndex) {
-    const { state } = this;
-    const { color } = state;
+    const color = this.getColor();
     const pos = this.sourcePosition(index);
     const height = this.valueOfSource(index);
     const onClick = () => this.handleSourceClick(index);
-    const isSelected = state.selectedSources.includes(index);
+    const isSelected = this.state.selectedSources.includes(index);
     return <BNode {...{height, pos, onClick, isSelected, color}} key={index}/>;
   }
 
   private renderTargetNode(index: nodeIndex) {
-    const { state } = this;
-    const { color } = state;
+    const color = this.getColor();
     const pos = this.targetPosition(index);
     const height = this.valueOfTarget(index);
     const onClick = () => this.handleTargetClick(index);
@@ -245,7 +244,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return offset;
   }
 
-  private slider () {
+  private tightnessSlider () {
     return (
       <input
         type="range"
@@ -254,6 +253,19 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         value={this.state.tightness}
         step="0.01"
         onChange={(e) => this.setState({tightness: +e.target.value})}
+      />
+    );
+  }
+
+  private colorSlider () {
+    return (
+      <input
+        type="range"
+        min="0"
+        max="360"
+        value={this.state.colorVal}
+        step="1"
+        onChange={(e) => this.setState({colorVal: +e.target.value})}
       />
     );
   }
@@ -346,22 +358,27 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private colorDefs() {
+    const color = this.getColor();
     return (
       <defs>
         <linearGradient id="left-highlighted">
-            <stop offset="0%" stop-color={this.state.color}/>
+            <stop offset="0%" stop-color={color}/>
             <stop offset="100%" stop-color="black"/>
         </linearGradient>
         <linearGradient id="right-highlighted">
             <stop offset="0%" stop-color="black"/>
-            <stop offset="100%" stop-color={this.state.color}/>
+            <stop offset="100%" stop-color={color}/>
         </linearGradient>
         <linearGradient id="both-highlighted">
-            <stop offset="0%" stop-color={this.state.color}/>
-            <stop offset="100%" stop-color={this.state.color}/>
+            <stop offset="0%" stop-color={color}/>
+            <stop offset="100%" stop-color={color}/>
         </linearGradient>
       </defs>
     )
+  }
+
+  private getColor(): string {
+    return `hsl(${this.state.colorVal}, 100%, 50%)`;
   }
 }
 
