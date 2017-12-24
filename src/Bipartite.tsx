@@ -43,6 +43,7 @@ export interface IBipartiteState {
   tightness: number;
   sourceColorVal: number;
   targetColorVal: number;
+  showChild: boolean;
 }
 
 export type NodePosition = {x: number, y: number};
@@ -55,7 +56,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     selectedLinks: lSet(),
     sourceColorVal: 0,
     targetColorVal: 180,
-    tightness: 0
+    tightness: 0,
+    showChild: false
   };
 
   private height = 400;
@@ -84,6 +86,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
           </svg>
           {this.renderButtons()}
         </span>
+        <button onClick={() => this.setState({showChild: true})}/>
+        {this.state.showChild ? this.renderChild() : null}
       </div>
     );
   }
@@ -356,6 +360,32 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
       isRightHighlighted: this.linkIsRightHighlighted(link),
       isSelected: this.linkIsSelected(link)
     };
+  }
+
+  private filteredGraph () {
+    const sourceSet = nSet();
+    const targetSet = nSet();
+
+    const filteredLinks = this.links.filter(link => (
+      this.linkIsSelected(link) ||
+      this.linkIsLeftHighlighted(link) ||
+      this.linkIsRightHighlighted(link)
+    ));
+
+    filteredLinks.forEach(link => {
+      sourceSet.add(link.source);
+      targetSet.add(link.target);
+    });
+
+    return {
+      links: filteredLinks,
+      sources: sourceSet.toArray(),
+      targets: targetSet.toArray()
+    };
+  }
+
+  private renderChild (): JSX.Element {
+    return <Bipartite graph={this.filteredGraph()} key={JSON.stringify(this.filteredGraph())}/>;
   }
 }
 
