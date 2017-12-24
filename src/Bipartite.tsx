@@ -63,6 +63,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private links = this.buildLinks();
   private sources = this.props.graph.sources;
   private targets = this.props.graph.targets;
+  private totalValue = this.valueOfLinks(this.links);
 
   public render () {
     const {width, height} = this;
@@ -252,16 +253,12 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     );
   }
 
-  private totalValue (): number {
-    return this.valueOfLinks(this.links);
-  }
-
   private valueOfLinks(links: IBLink[]): number {
     return links.reduce((acc, l) => acc + l.value, 0);
   }
 
   private nodeSpacing (collection: {}[]): number {
-    return (this.height - this.totalValue()) / (collection.length - 1);
+    return (this.height - this.totalValue) / (collection.length - 1);
   }
 
   private buildLinks (): IBLink[] {
@@ -299,7 +296,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         setSize={nodes.length}
         totalSize={allNodes.length}
         setValue={setValue}
-        totalValue={this.totalValue()}
+        totalValue={this.totalValue}
         onClick={() => this.setState(newState)}
         className={className}
       />
@@ -313,7 +310,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
         setSize={selectedLinks.size()}
         totalSize={this.links.length}
         setValue={this.valueOfLinks(selectedLinks.toArray())}
-        totalValue={this.totalValue()}
+        totalValue={this.totalValue}
         onClick={() => this.setState({selectedLinks: lSet()})}
         className="selected-links"
       />
