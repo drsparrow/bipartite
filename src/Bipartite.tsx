@@ -4,6 +4,7 @@ import BNode, { NODE_WIDTH } from './BNode';
 import BLink from './BLink';
 import ClearButton from './ClearButton';
 import ColorSlider from './ColorSlider';
+import ColorDefs from './ColorDefs';
 
 type BasicNode = string;
 type nodeIndex = number;
@@ -321,20 +322,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const sourceColor = this.getColor(SOURCE);
     const targetColor = this.getColor(TARGET);
     return (
-      <defs>
-        <linearGradient id="left-highlighted">
-            <stop offset="0%" stopColor={sourceColor}/>
-            <stop offset="100%" stopColor="black"/>
-        </linearGradient>
-        <linearGradient id="right-highlighted">
-            <stop offset="0%" stopColor="black"/>
-            <stop offset="100%" stopColor={targetColor}/>
-        </linearGradient>
-        <linearGradient id="both-highlighted">
-            <stop offset="0%" stopColor={sourceColor}/>
-            <stop offset="100%" stopColor={targetColor}/>
-        </linearGradient>
-      </defs>
+      <ColorDefs {...{sourceColor, targetColor}}/>
     );
   }
 
