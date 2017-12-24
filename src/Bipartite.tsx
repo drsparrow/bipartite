@@ -5,6 +5,7 @@ import BLink from './BLink';
 import ClearButton from './ClearButton';
 import ColorSlider from './ColorSlider';
 import ColorDefs from './ColorDefs';
+import { colorValToHsl, Color } from './colorHelper';
 
 type BasicNode = string;
 type nodeIndex = number;
@@ -326,7 +327,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     );
   }
 
-  private getColor(type: BNodeType): string {
+  private getColor(type: BNodeType): Color {
     const {sourceColorVal, targetColorVal} = this.state;
     return colorValToHsl(isSource(type) ? sourceColorVal : targetColorVal);
   }
@@ -346,8 +347,6 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return nodes.includes(node);
   }
 }
-
-const colorValToHsl = (val: number) => `hsl(${val}, 100%, 50%)`;
 
 const nSet = Set.emptySet<number>();
 const lSet = Set.emptySet<IBasicBLink>();

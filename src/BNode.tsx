@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { NodePosition } from './Bipartite';
+import { Color } from './colorHelper';
 
 interface Props {
   pos: NodePosition;
   height: number;
   onClick: () => void;
   isSelected: boolean;
-  color: string;
+  color: Color;
 }
 
 export const NODE_WIDTH = 10;

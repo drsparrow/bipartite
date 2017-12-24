@@ -1,8 +1,9 @@
 import * as React from 'react';
+import { Color } from './colorHelper';
 
 interface Props {
-  sourceColor: string;
-  targetColor: string;
+  sourceColor: Color;
+  targetColor: Color;
 }
 
 export default function ColorDefs (props: Props) {
