@@ -171,11 +171,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const { x1, x2, state } = this;
     const { source, target, value } = link;
     const {tightness} = state;
-    const y1 = this.nodeHeight(source, SOURCE) + this.sourceOffset(link) + link.value / 2;
-    const y2 = this.nodeHeight(target, TARGET) + this.targetOffset(link) + link.value / 2;
-    const isLeftHighlighted = this.linkIsLeftHighlighted(link);
-    const isRightHighlighted = this.linkIsRightHighlighted(link);
-    const isSelected = this.linkIsSelected(link);
+    const { y1, y2 } = this.linkYs(link);
+    const {isLeftHighlighted, isRightHighlighted, isSelected} = this.linkSelected(link);
     const key = `${source}-${target}`;
     const onClick = () => this.handleLinkClick(link);
 
@@ -345,6 +342,23 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const {selectedSources, selectedTargets} = this.state;
     const nodes = isSource(type) ? selectedSources : selectedTargets;
     return nodes.includes(node);
+  }
+
+  private linkYs(link: IBLink) {
+    const { source, target } = link;
+    const midpoint = link.value / 2;
+    return {
+      y1: this.nodeHeight(source, SOURCE) + this.sourceOffset(link) + midpoint,
+      y2: this.nodeHeight(target, TARGET) + this.targetOffset(link) + midpoint,
+    };
+  }
+
+  private linkSelected(link: IBLink) {
+    return {
+      isLeftHighlighted: this.linkIsLeftHighlighted(link),
+      isRightHighlighted: this.linkIsRightHighlighted(link),
+      isSelected: this.linkIsSelected(link)
+    };
   }
 }
 
