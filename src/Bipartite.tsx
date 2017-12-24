@@ -140,16 +140,13 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private handleNodeClick (index: nodeIndex, type: BNodeType) {
     this.setState(prevState => {
-      const {selectedSources, selectedTargets} = prevState;
+      let {selectedSources, selectedTargets} = prevState;
       if (isSource(type)) {
-        return {
-          selectedSources: selectedSources.toggleAndCopy(index), selectedTargets
-        };
+        selectedSources = selectedSources.toggleAndCopy(index);
       } else {
-        return {
-          selectedTargets: selectedTargets.toggleAndCopy(index), selectedSources
-        };
+        selectedTargets = selectedTargets.toggleAndCopy(index);
       }
+      return {selectedSources, selectedTargets};
     });
   }
 
