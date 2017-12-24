@@ -10,6 +10,9 @@ type nodeIndex = number;
 type NSet = Set<number>;
 type LSet = Set<IBasicBLink>;
 
+enum BNodeType { SOURCE, TARGET }
+const { SOURCE, TARGET } = BNodeType;
+
 interface IBasicBLink {
   source: nodeIndex;
   target: nodeIndex;
@@ -82,39 +85,21 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     );
   }
 
-  private sourcePosition (index: nodeIndex): NodePosition {
+  private nodePosition (index: nodeIndex, type: nodeIndex): NodePosition {
+    const {x1, x2} = this;
     return {
-      x: this.x1,
-      y: this.sourceHeight(index)
+      x: isSource(type) ? x1 : x2 - NODE_WIDTH,
+      y: this.nodeHeight(index, type)
     };
   }
 
-  private targetPosition (index: nodeIndex): NodePosition {
-    return {
-      x: this.x2 - NODE_WIDTH,
-      y: this.targetHeight(index)
-    };
-  }
-
-  private sourceHeight(index: nodeIndex) {
+  private nodeHeight(index: nodeIndex, type: BNodeType) {
     let height = 0;
-    let sourceSpacing = this.sourceSpacing();
+    let spacing = this.nodeSpacing(isSource(type) ? this.sources : this.targets);
 
     for (let i = 0; i < index; i++) {
-      height += this.valueOfSource(i);
-      height += sourceSpacing;
-    }
-
-    return height;
-  }
-
-  private targetHeight(index: nodeIndex) {
-    let height = 0;
-    let targetSpacing = this.targetSpacing();
-
-    for (let i = 0; i < index; i++) {
-      height += this.valueOfTarget(i);
-      height += targetSpacing;
+      height += this.valueOfNode(i, type);
+      height += spacing;
     }
 
     return height;
@@ -123,7 +108,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderSources () {
     return (
       <g className="sources">
-        {this.sources.map((n, i) => this.renderSourceNode(i))}
+        {this.sources.map((n, i) => this.renderNode(i, SOURCE))}
       </g>
     );
   }
@@ -131,47 +116,38 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderTargets () {
     return (
       <g className="targets">
-        {this.targets.map((n, i) => this.renderTargetNode(i))}
+        {this.targets.map((n, i) => this.renderNode(i, TARGET))}
       </g>
     );
   }
 
-  private renderSourceNode(index: nodeIndex) {
-    const color = this.getSourceColor();
-    const pos = this.sourcePosition(index);
-    const height = this.valueOfSource(index);
-    const onClick = () => this.handleSourceClick(index);
-    const isSelected = this.state.selectedSources.includes(index);
+  private renderNode(index: nodeIndex, type: BNodeType) {
+    const color = this.getColor(type);
+    const pos = this.nodePosition(index, type);
+    const height = this.valueOfNode(index, type);
+    const onClick = () => this.handleNodeClick(index, type);
+    const isSelected = this.nodeIsSelected(index, type);
     return <BNode {...{height, pos, onClick, isSelected, color}} key={index}/>;
   }
 
-  private renderTargetNode(index: nodeIndex) {
-    const color = this.getTargetColor();
-    const pos = this.targetPosition(index);
-    const height = this.valueOfTarget(index);
-    const onClick = () => this.handleTargetClick(index);
-    const isSelected = this.state.selectedTargets.includes(index);
-    return <BNode {...{height, pos, onClick, isSelected, color}} key={index}/>;
+  private valueOfNode(index: nodeIndex, type: BNodeType) {
+    const links = this.linksWithNode(index, type);
+    return this.valueOfLinks(links);
   }
 
-  private valueOfSource(index: nodeIndex): number {
-    return this.valueOfLinks(this.linksWithSource(index));
-  }
-
-  private valueOfTarget(index: nodeIndex): number {
-    return this.valueOfLinks(this.linksWithTarget(index));
-  }
-
-  private handleSourceClick (index: nodeIndex) {
-    this.setState(prevState => ({
-      selectedSources: prevState.selectedSources.toggleAndCopy(index)
-    }));
-  }
-
-  private handleTargetClick (index: nodeIndex) {
-    this.setState(prevState => ({
-      selectedTargets: prevState.selectedTargets.toggleAndCopy(index)
-    }));
+  private handleNodeClick (index: nodeIndex, type: BNodeType) {
+    this.setState(prevState => {
+      const {selectedSources, selectedTargets} = prevState;
+      if (isSource(type)) {
+        return {
+          selectedSources: selectedSources.toggleAndCopy(index), selectedTargets
+        };
+      } else {
+        return {
+          selectedTargets: selectedTargets.toggleAndCopy(index), selectedSources
+        };
+      }
+    });
   }
 
   private handleLinkClick (link: IBLink) {
@@ -192,8 +168,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const { x1, x2, state } = this;
     const { source, target, value } = link;
     const {tightness} = state;
-    const y1 = this.sourceHeight(source) + this.sourceOffset(link) + link.value / 2;
-    const y2 = this.targetHeight(target) + this.targetOffset(link) + link.value / 2;
+    const y1 = this.nodeHeight(source, SOURCE) + this.sourceOffset(link) + link.value / 2;
+    const y2 = this.nodeHeight(target, TARGET) + this.targetOffset(link) + link.value / 2;
     const isLeftHighlighted = this.linkIsLeftHighlighted(link);
     const isRightHighlighted = this.linkIsRightHighlighted(link);
     const isSelected = this.linkIsSelected(link);
@@ -220,21 +196,18 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private sourceOffset (link: IBLink): number {
-    const links = this.linksWithSource(link.source);
+    const links = this.linksWithNode(link.source, SOURCE);
     return this.offsetFromLinks(link, links);
   }
 
   private targetOffset (link: IBLink): number {
-    const links = this.linksWithTarget(link.target);
+    const links = this.linksWithNode(link.target, TARGET);
     return this.offsetFromLinks(link, links);
   }
 
-  private linksWithSource(index: nodeIndex) {
-    return this.links.filter(l => l.source === index);
-  }
-
-  private linksWithTarget(index: nodeIndex) {
-    return this.links.filter(l => l.target === index);
+  private linksWithNode(index: nodeIndex, type: BNodeType) {
+    const getter = isSource(type) ? (l: IBLink) => l.source : (l: IBLink) => l.target;
+    return this.links.filter(link => getter(link) === index);
   }
 
   private offsetFromLinks (link: IBLink, links: IBLink[]) {
@@ -287,14 +260,6 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     return links.reduce((acc, l) => acc + l.value, 0);
   }
 
-  private sourceSpacing (): number {
-    return this.nodeSpacing(this.sources);
-  }
-
-  private targetSpacing (): number {
-    return this.nodeSpacing(this.targets);
-  }
-
   private nodeSpacing (collection: {}[]): number {
     return (this.height - this.totalValue()) / (collection.length - 1);
   }
@@ -311,43 +276,32 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderButtons () {
     return (
       <div>
-        {this.renderSourceButton()}
+        {this.renderNodeButton(SOURCE)}
         {this.renderLinksButton()}
-        {this.renderTargetButton()}
+        {this.renderNodeButton(TARGET)}
       </div>
     );
   }
 
-  private renderSourceButton() {
-    const { selectedSources } = this.state;
-    const setValue = selectedSources.toArray()
-      .reduce((acc, n) => acc + this.valueOfSource(n), 0);
+  private renderNodeButton(type: BNodeType) {
+    const { selectedTargets, selectedSources } = this.state;
+    const nodes = (isSource(type) ? selectedSources : selectedTargets).toArray();
+    const allNodes = isSource(type) ? this.sources : this.targets;
+    const setValue = nodes.reduce((acc, n) => acc + this.valueOfNode(n, type), 0);
+    const className = isSource(type) ? 'float-left' : 'float-right';
+
+    const clearSource = {selectedSources: nSet(), selectedTargets};
+    const clearTarget = {selectedTargets: nSet(), selectedSources};
+    const newState = isSource(type) ? clearSource : clearTarget;
 
     return (
       <ClearButton
-        setSize={this.state.selectedSources.size()}
-        totalSize={this.sources.length}
+        setSize={nodes.length}
+        totalSize={allNodes.length}
         setValue={setValue}
         totalValue={this.totalValue()}
-        onClick={() => this.setState({selectedSources: nSet()})}
-        className="float-left"
-      />
-    );
-  }
-
-  private renderTargetButton() {
-    const { selectedTargets } = this.state;
-    const setValue = selectedTargets.toArray()
-      .reduce((acc, n) => acc + this.valueOfTarget(n), 0);
-
-    return (
-      <ClearButton
-        setSize={selectedTargets.size()}
-        totalSize={this.targets.length}
-        setValue={setValue}
-        totalValue={this.totalValue()}
-        onClick={() => this.setState({selectedTargets: nSet()})}
-        className="float-right"
+        onClick={() => this.setState(newState)}
+        className={className}
       />
     );
   }
@@ -367,8 +321,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private colorDefs() {
-    const sourceColor = this.getSourceColor();
-    const targetColor = this.getTargetColor();
+    const sourceColor = this.getColor(SOURCE);
+    const targetColor = this.getColor(TARGET);
     return (
       <defs>
         <linearGradient id="left-highlighted">
@@ -387,21 +341,24 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     );
   }
 
-  private getSourceColor(): string {
-    return colorValToHsl(this.state.sourceColorVal);
-  }
-
-  private getTargetColor(): string {
-    return colorValToHsl(this.state.targetColorVal);
+  private getColor(type: BNodeType): string {
+    const {sourceColorVal, targetColorVal} = this.state;
+    return colorValToHsl(isSource(type) ? sourceColorVal : targetColorVal);
   }
 
   private svgStyle() {
     const border = '5px solid';
     return {
       border: `${border} black`,
-      borderLeft: `${border} ${this.getSourceColor()}`,
-      borderRight: `${border} ${this.getTargetColor()}`,
+      borderLeft: `${border} ${this.getColor(SOURCE)}`,
+      borderRight: `${border} ${this.getColor(TARGET)}`,
     };
+  }
+
+  private nodeIsSelected(node: nodeIndex, type: BNodeType) {
+    const {selectedSources, selectedTargets} = this.state;
+    const nodes = isSource(type) ? selectedSources : selectedTargets;
+    return nodes.includes(node);
   }
 }
 
@@ -409,3 +366,5 @@ const colorValToHsl = (val: number) => `hsl(${val}, 100%, 50%)`;
 
 const nSet = Set.emptySet<number>();
 const lSet = Set.emptySet<IBasicBLink>();
+
+const isSource = (type: BNodeType): boolean => type === SOURCE;
