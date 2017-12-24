@@ -7,38 +7,46 @@ import ColorSlider from './ColorSlider';
 import ColorDefs from './ColorDefs';
 import { colorValToHsl, Color } from './colorHelper';
 
-type BasicNode = string;
+type NodeId = string;
 type nodeIndex = number;
-type NSet = Set<number>;
-type LSet = Set<IBasicBLink>;
+type nSet = Set<BNodeData>;
+type LSet = Set<IBLink>;
+type BNodeData = {index: nodeIndex, id: NodeId, type: BNodeType};
 
 enum BNodeType { SOURCE, TARGET }
 const { SOURCE, TARGET } = BNodeType;
 
-interface IBasicBLink {
+interface IRawBLink {
   source: nodeIndex;
   target: nodeIndex;
-  value: number; // evil. value should be in IBLink
+  value: number;
 }
 
-export interface IBLink<DataType = {}> extends IBasicBLink {
-  data?: DataType;
+interface IBLink {
+  source: BNodeData;
+  target: BNodeData;
+  value: number;
 }
 
-export interface IBGraph<NodeType = BasicNode, LinkType = {}> {
-  sources: NodeType[];
-  targets: NodeType[];
-  links: IBLink<LinkType>[];
+export interface IBGraph {
+  sources: BNodeData[];
+  targets: BNodeData[];
+  links: IBLink[];
 }
 
-export interface IBipartiteProps<NodeType = {}, LinkType = {}, DataType = {}> {
-  graph: IBGraph<NodeType, LinkType>;
-  data?: DataType;
+export interface IRawBGraph {
+  sources: NodeId[];
+  targets: NodeId[];
+  links: IRawBLink[];
+}
+
+export interface IBipartiteProps {
+  graph: IRawBGraph;
 }
 
 export interface IBipartiteState {
-  selectedSources: NSet;
-  selectedTargets: NSet;
+  selectedSources: nSet;
+  selectedTargets: nSet;
   selectedLinks: LSet;
   tightness: number;
   sourceColorVal: number;
@@ -64,9 +72,9 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private width = 700;
   private x1 = 0;
   private x2 = this.width;
-  private links = this.buildLinks();
-  private sources = this.props.graph.sources;
-  private targets = this.props.graph.targets;
+  private sources: BNodeData[] = this.props.graph.sources.map((n: NodeId, i) => ({id: n, index: i, type: SOURCE}));
+  private targets: BNodeData[] = this.props.graph.targets.map((n: NodeId, i) => ({id: n, index: i, type: TARGET}));
+  private links: IBLink[] = this.buildLinks();
   private totalValue = this.valueOfLinks(this.links);
 
   public render () {
@@ -92,20 +100,21 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     );
   }
 
-  private nodePosition (index: nodeIndex, type: nodeIndex): NodePosition {
+  private nodePosition (node: BNodeData): NodePosition {
     const {x1, x2} = this;
     return {
-      x: isSource(type) ? x1 : x2 - NODE_WIDTH,
-      y: this.nodeHeight(index, type)
+      x: isSource(node.type) ? x1 : x2 - NODE_WIDTH,
+      y: this.nodeHeight(node)
     };
   }
 
-  private nodeHeight(index: nodeIndex, type: BNodeType) {
+  private nodeHeight(node: BNodeData) {
     let height = 0;
-    let spacing = this.nodeSpacing(isSource(type) ? this.sources : this.targets);
+    const nodes = isSource(node.type) ? this.sources : this.targets;
+    let spacing = this.nodeSpacing(nodes);
 
-    for (let i = 0; i < index; i++) {
-      height += this.valueOfNode(i, type);
+    for (let i = 0; i < node.index; i++) {
+      height += this.valueOfNode(nodes[i]);
       height += spacing;
     }
 
@@ -115,7 +124,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderSources () {
     return (
       <g className="sources">
-        {this.sources.map((n, i) => this.renderNode(i, SOURCE))}
+        {this.sources.map((n, i) => this.renderNode(n))}
       </g>
     );
   }
@@ -123,32 +132,33 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   private renderTargets () {
     return (
       <g className="targets">
-        {this.targets.map((n, i) => this.renderNode(i, TARGET))}
+        {this.targets.map((n, i) => this.renderNode(n))}
       </g>
     );
   }
 
-  private renderNode(index: nodeIndex, type: BNodeType) {
+  private renderNode(node: BNodeData) {
+    const {type, index} = node;
     const color = this.getColor(type);
-    const pos = this.nodePosition(index, type);
-    const height = this.valueOfNode(index, type);
-    const onClick = () => this.handleNodeClick(index, type);
-    const isSelected = this.nodeIsSelected(index, type);
+    const pos = this.nodePosition(node);
+    const height = this.valueOfNode(node);
+    const onClick = () => this.handleNodeClick(node);
+    const isSelected = this.nodeIsSelected(node);
     return <BNode {...{height, pos, onClick, isSelected, color}} key={index}/>;
   }
 
-  private valueOfNode(index: nodeIndex, type: BNodeType) {
-    const links = this.linksWithNode(index, type);
+  private valueOfNode(node: BNodeData) {
+    const links = this.linksWithNode(node);
     return this.valueOfLinks(links);
   }
 
-  private handleNodeClick (index: nodeIndex, type: BNodeType) {
+  private handleNodeClick (node: BNodeData) {
     this.setState(prevState => {
       let {selectedSources, selectedTargets} = prevState;
-      if (isSource(type)) {
-        selectedSources = selectedSources.toggleAndCopy(index);
+      if (isSource(node.type)) {
+        selectedSources = selectedSources.toggleAndCopy(node);
       } else {
-        selectedTargets = selectedTargets.toggleAndCopy(index);
+        selectedTargets = selectedTargets.toggleAndCopy(node);
       }
       return {selectedSources, selectedTargets};
     });
@@ -174,7 +184,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const {tightness} = state;
     const { y1, y2 } = this.linkYs(link);
     const {isLeftHighlighted, isRightHighlighted, isSelected} = this.linkSelected(link);
-    const key = `${source}-${target}`;
+    const key = `${source.id}-${target.id}`;
     const onClick = () => this.handleLinkClick(link);
 
     return (
@@ -197,18 +207,18 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private sourceOffset (link: IBLink): number {
-    const links = this.linksWithNode(link.source, SOURCE);
+    const links = this.linksWithNode(link.source);
     return this.offsetFromLinks(link, links);
   }
 
   private targetOffset (link: IBLink): number {
-    const links = this.linksWithNode(link.target, TARGET);
+    const links = this.linksWithNode(link.target);
     return this.offsetFromLinks(link, links);
   }
 
-  private linksWithNode(index: nodeIndex, type: BNodeType) {
-    const getter = isSource(type) ? (l: IBLink) => l.source : (l: IBLink) => l.target;
-    return this.links.filter(link => getter(link) === index);
+  private linksWithNode(node: BNodeData) {
+    const getter = isSource(node.type) ? (l: IBLink) => l.source : (l: IBLink) => l.target;
+    return this.links.filter(link => getter(link).index === node.index);
   }
 
   private offsetFromLinks (link: IBLink, links: IBLink[]) {
@@ -263,11 +273,15 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
 
   private buildLinks (): IBLink[] {
     const { links } = this.props.graph;
-    return links.sort((a, b) => {
+    const sorted = links.sort((a, b) => {
       const diff = a.source - b.source;
       if (diff) { return diff; }
       return a.target - b.target;
     });
+
+    return sorted.map((link) => (
+      {value: link.value, source: this.sources[link.source], target: this.targets[link.target]}
+    ));
   }
 
   private renderButtons () {
@@ -284,7 +298,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const { selectedTargets, selectedSources } = this.state;
     const nodes = (isSource(type) ? selectedSources : selectedTargets).toArray();
     const allNodes = isSource(type) ? this.sources : this.targets;
-    const setValue = nodes.reduce((acc, n) => acc + this.valueOfNode(n, type), 0);
+    const setValue = nodes.reduce((acc, n) => acc + this.valueOfNode(n), 0);
     const className = isSource(type) ? 'float-left' : 'float-right';
 
     const clearSource = {selectedSources: nSet(), selectedTargets};
@@ -339,9 +353,9 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     };
   }
 
-  private nodeIsSelected(node: nodeIndex, type: BNodeType) {
+  private nodeIsSelected(node: BNodeData) {
     const {selectedSources, selectedTargets} = this.state;
-    const nodes = isSource(type) ? selectedSources : selectedTargets;
+    const nodes = isSource(node.type) ? selectedSources : selectedTargets;
     return nodes.includes(node);
   }
 
@@ -349,8 +363,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     const { source, target } = link;
     const midpoint = link.value / 2;
     return {
-      y1: this.nodeHeight(source, SOURCE) + this.sourceOffset(link) + midpoint,
-      y2: this.nodeHeight(target, TARGET) + this.targetOffset(link) + midpoint,
+      y1: this.nodeHeight(source) + this.sourceOffset(link) + midpoint,
+      y2: this.nodeHeight(target) + this.targetOffset(link) + midpoint,
     };
   }
 
@@ -363,8 +377,8 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 
   private filteredGraph () {
-    const sourceSet = nSet();
-    const targetSet = nSet();
+    const sourceSet = new Set<NodeId>();
+    const targetSet = new Set<NodeId>();
 
     const filteredLinks = this.links.filter(link => (
       this.linkIsSelected(link) ||
@@ -373,15 +387,20 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
     ));
 
     filteredLinks.forEach(link => {
-      sourceSet.add(link.source);
-      targetSet.add(link.target);
+      sourceSet.add(link.source.id);
+      targetSet.add(link.target.id);
     });
 
-    return {
-      links: filteredLinks,
-      sources: sourceSet.toArray(),
-      targets: targetSet.toArray()
-    };
+    const sources = sourceSet.toArray();
+    const targets = targetSet.toArray();
+
+    const links = filteredLinks.map(link => ({
+      value: link.value,
+      source: sources.indexOf(link.source.id),
+      target: targets.indexOf(link.target.id)
+    }));
+
+    return { links, sources, targets };
   }
 
   private renderChild (): JSX.Element {
@@ -389,7 +408,7 @@ export default class Bipartite extends React.Component<IBipartiteProps, IBiparti
   }
 }
 
-const nSet = Set.emptySet<number>();
-const lSet = Set.emptySet<IBasicBLink>();
+const nSet = Set.emptySet<BNodeData>();
+const lSet = Set.emptySet<IBLink>();
 
 const isSource = (type: BNodeType): boolean => type === SOURCE;
